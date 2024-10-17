@@ -19,7 +19,7 @@ resource "github_repository_environment" "this" {
 }
 
 resource "github_repository_deployment_branch_policy" "this" {
-  count       = var.custom_branch_policies && var.branch != null
+  count       = var.custom_branch_policies && var.branch != null ? 1 : 0
   repository  = data.github_repository.repo.name
   environment = github_repository_environment.this.environment
   name        = var.branch
