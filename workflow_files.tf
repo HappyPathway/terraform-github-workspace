@@ -6,6 +6,7 @@ resource "github_repository_file" "plan" {
     "${path.module}/workflow-templates/terraform-plan.yaml",
     {
       repo_name            = data.github_repository.repo.name,
+      repo_org             = var.repo_org,
       branch               = var.branch,
       secrets              = var.secrets,
       vars                 = var.vars,
@@ -32,6 +33,7 @@ resource "github_repository_file" "apply" {
     "${path.module}/workflow-templates/terraform-apply.yaml",
     {
       repo_name            = data.github_repository.repo.name,
+      repo_org             = var.repo_org,
       branch               = var.branch,
       secrets              = var.secrets,
       vars                 = var.vars,
