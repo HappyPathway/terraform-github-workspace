@@ -69,12 +69,58 @@ variable "environment" {
 }
 
 variable "branch" {
-  type        = string
-  description = "The branch name"
-  default     = null
+  type = object({
+    create_branch                   = bool
+    pattern                         = string
+    enforce_admins                  = bool
+    strict                          = bool
+    contexts                        = list(string)
+    dismiss_stale_reviews           = bool
+    require_code_owner_reviews      = bool
+    required_approving_review_count = number
+  })
+  description = "Branch protection configuration"
+  default = {
+    create_branch                   = false
+    pattern                         = ""
+    enforce_admins                  = false
+    strict                          = false
+    contexts                        = []
+    dismiss_stale_reviews           = false
+    require_code_owner_reviews      = false
+    required_approving_review_count = 0
+  }
   validation {
-    condition     = var.branch == null || length(var.branch) > 0
-    error_message = "Branch name must not be empty."
+    condition     = var.branch.create_branch == true || var.branch.create_branch == false
+    error_message = "Create branch must be a boolean."
+  }
+  validation {
+    condition     = length(var.branch.pattern) > 0
+    error_message = "Branch pattern must not be empty."
+  }
+  validation {
+    condition     = var.branch.enforce_admins == true || var.branch.enforce_admins == false
+    error_message = "Enforce admins must be a boolean."
+  }
+  validation {
+    condition     = var.branch.strict == true || var.branch.strict == false
+    error_message = "Strict must be a boolean."
+  }
+  validation {
+    condition     = length(var.branch.contexts) >= 0
+    error_message = "Contexts must be a list of strings."
+  }
+  validation {
+    condition     = var.branch.dismiss_stale_reviews == true || var.branch.dismiss_stale_reviews == false
+    error_message = "Dismiss stale reviews must be a boolean."
+  }
+  validation {
+    condition     = var.branch.require_code_owner_reviews == true || var.branch.require_code_owner_reviews == false
+    error_message = "Require code owner reviews must be a boolean."
+  }
+  validation {
+    condition     = var.branch.required_approving_review_count >= 0
+    error_message = "Required approving review count must be a non-negative number."
   }
 }
 
@@ -107,15 +153,6 @@ variable "protected_branches" {
   }
 }
 
-variable "enforce_admins" {
-  type        = bool
-  description = "Flag to enforce admin rules"
-  validation {
-    condition     = var.enforce_admins == true || var.enforce_admins == false
-    error_message = "Enforce admins must be a boolean."
-  }
-}
-
 variable "reviewers_teams" {
   type        = list(string)
   description = "List of reviewer teams"
@@ -136,58 +173,12 @@ variable "reviewers_users" {
   }
 }
 
-variable "branch_pattern" {
-  type        = string
-  description = "Branch pattern for deployment policy"
-  default     = null
-  validation {
-    condition     = var.branch_pattern == null || length(var.branch_pattern) > 0
-    error_message = "Branch pattern must not be empty."
-  }
-}
-
-variable "contexts" {
-  type        = list(string)
-  description = "List of status check contexts"
-  validation {
-    condition     = length(var.contexts) >= 0
-    error_message = "Contexts must be a list of strings."
-  }
-}
-
-variable "strict" {
-  type        = bool
-  description = "Flag to enforce strict status checks"
-  validation {
-    condition     = var.strict == true || var.strict == false
-    error_message = "Strict must be a boolean."
-  }
-}
-
 variable "restrictions_teams" {
   type        = list(string)
   description = "List of teams with branch restrictions"
   validation {
     condition     = length(var.restrictions_teams) >= 0
     error_message = "Restrictions teams must be a list of strings."
-  }
-}
-
-variable "required_approving_review_count" {
-  type        = number
-  description = "Number of required approving reviews"
-  validation {
-    condition     = var.required_approving_review_count >= 0
-    error_message = "Required approving review count must be a non-negative number."
-  }
-}
-
-variable "dismiss_stale_reviews" {
-  type        = bool
-  description = "Flag to dismiss stale reviews"
-  validation {
-    condition     = var.dismiss_stale_reviews == true || var.dismiss_stale_reviews == false
-    error_message = "Dismiss stale reviews must be a boolean."
   }
 }
 
@@ -218,12 +209,12 @@ variable "custom_branch_policies" {
   }
 }
 
-variable "require_code_owner_reviews" {
-  type        = bool
-  description = "Flag to require code owner reviews"
+variable "branch_pattern" {
+  type        = string
+  description = "The branch pattern"
   validation {
-    condition     = var.require_code_owner_reviews == true || var.require_code_owner_reviews == false
-    error_message = "Require code owner reviews must be a boolean."
+    condition     = length(var.branch_pattern) > 0
+    error_message = "Branch pattern must not be empty."
   }
 }
 
