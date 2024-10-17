@@ -7,7 +7,7 @@ resource "github_repository_file" "plan" {
     {
       repo_name            = data.github_repository.repo.name,
       repo_org             = var.repo_org,
-      branch               = var.branch,
+      branch               = var.branch.name,
       secrets              = var.secrets,
       vars                 = var.vars,
       runs_on              = var.runner_group,
@@ -34,7 +34,7 @@ resource "github_repository_file" "apply" {
     {
       repo_name            = data.github_repository.repo.name,
       repo_org             = var.repo_org,
-      branch               = var.branch,
+      branch               = var.branch.name,
       secrets              = var.secrets,
       vars                 = var.vars,
       runs_on              = var.runner_group,
