@@ -27,16 +27,16 @@ variable "vars" {
 variable "composite_action_repos" {
   type = map(string)
   default = {
-    gh_actions_checkout  = "gh-actions-checkout@v4"
+    checkout             = "gh-actions-checkout@v4"
     aws_auth             = "aws-auth@main"
-    gh_actions_terraform = "gh-actions-terraform@v1"
+    setup_terraform      = "gh-actions-terraform@v1"
     terraform_init       = "terraform-init@main"
     terraform_plan       = "terraform-plan@main"
     terraform_apply      = "terraform-apply@main"
     gh_auth              = "gh-auth@main"
   }
   validation {
-    condition     = length(var.repos) > 0
+    condition     = length(var.composite_action_repos) >= 0
     error_message = "Repos map must not be empty."
   }
 }
@@ -71,8 +71,9 @@ variable "environment" {
 variable "branch" {
   type        = string
   description = "The branch name"
+  default     = null
   validation {
-    condition     = length(var.branch) > 0
+    condition     = var.branch == null || length(var.branch) > 0
     error_message = "Branch name must not be empty."
   }
 }
@@ -89,6 +90,7 @@ variable "reviewers" {
 variable "create_branch" {
   type        = bool
   description = "Flag to create a branch"
+  default     = false
   validation {
     condition     = var.create_branch == true || var.create_branch == false
     error_message = "Create branch must be a boolean."
@@ -98,6 +100,7 @@ variable "create_branch" {
 variable "protected_branches" {
   type        = bool
   description = "Flag to protect branches"
+  default     = true
   validation {
     condition     = var.protected_branches == true || var.protected_branches == false
     error_message = "Protected branches must be a boolean."
@@ -116,8 +119,19 @@ variable "enforce_admins" {
 variable "reviewers_teams" {
   type        = list(string)
   description = "List of reviewer teams"
+  default     = []
   validation {
     condition     = length(var.reviewers_teams) >= 0
+    error_message = "Reviewer teams must be a list of strings."
+  }
+}
+
+variable "reviewers_users" {
+  type        = list(string)
+  description = "List of reviewer teams"
+  default     = []
+  validation {
+    condition     = length(var.reviewers_users) >= 0
     error_message = "Reviewer teams must be a list of strings."
   }
 }
