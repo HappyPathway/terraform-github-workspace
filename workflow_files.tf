@@ -7,7 +7,7 @@ resource "github_repository_file" "plan" {
     {
       repo_name            = data.github_repository.repo.name,
       repo_org             = var.repo_org,
-      branch               = var.branch,
+      branch               = var.branch.name,
       secrets              = var.secrets,
       vars                 = var.vars,
       runs_on              = var.runner_group,
@@ -22,7 +22,7 @@ resource "github_repository_file" "plan" {
       staging_environment  = lookup(github_repository_environment.this, "${var.environment}-staging").environment
     }
   )
-  branch = var.branch
+  branch = data.github_repository.repo.default_branch
 }
 
 # Resource to create a GitHub repository file for Terraform apply workflow
@@ -34,7 +34,7 @@ resource "github_repository_file" "apply" {
     {
       repo_name            = data.github_repository.repo.name,
       repo_org             = var.repo_org,
-      branch               = var.branch,
+      branch               = var.branch.name,
       secrets              = var.secrets,
       vars                 = var.vars,
       runs_on              = var.runner_group,
@@ -49,7 +49,7 @@ resource "github_repository_file" "apply" {
       staging_environment  = lookup(github_repository_environment.this, "${var.environment}-staging").environment
     }
   )
-  branch = var.branch
+  branch = data.github_repository.repo.default_branch
 }
 
 # Resource to create a GitHub repository file for Terraform init workflow

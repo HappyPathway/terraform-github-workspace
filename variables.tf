@@ -70,25 +70,19 @@ variable "environment" {
 
 variable "branch" {
   type = object({
-    create_branch                   = bool
-    pattern                         = string
-    enforce_admins                  = bool
-    strict                          = bool
-    contexts                        = list(string)
-    dismiss_stale_reviews           = bool
-    require_code_owner_reviews      = bool
-    required_approving_review_count = number
+    name                            = string
+    create_branch                   = optional(bool, false)
+    pattern                         = optional(string, "")
+    enforce_admins                  = optional(bool, false)
+    strict                          = optional(bool, false)
+    contexts                        = optional(list(string), [])
+    dismiss_stale_reviews           = optional(bool, true)
+    require_code_owner_reviews      = optional(bool, false)
+    required_approving_review_count = optional(number, 1)
   })
   description = "Branch protection configuration"
   default = {
-    create_branch                   = false
-    pattern                         = ""
-    enforce_admins                  = false
-    strict                          = false
-    contexts                        = []
-    dismiss_stale_reviews           = false
-    require_code_owner_reviews      = false
-    required_approving_review_count = 0
+    name = "main"
   }
   validation {
     condition     = var.branch.create_branch == true || var.branch.create_branch == false
