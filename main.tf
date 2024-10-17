@@ -18,6 +18,13 @@ resource "github_repository_environment" "this" {
   }
 }
 
+resource "github_repository_deployment_branch_policy" "this" {
+  count       = var.custom_branch_policies && var.branch != null
+  repository  = data.github_repository.repo.name
+  environment = github_repository_environment.this.environment
+  name        = var.branch
+}
+
 # Resource to create a deployment policy for the GitHub repository environment
 resource "github_repository_environment_deployment_policy" "this" {
   repository     = data.github_repository.repo.name
