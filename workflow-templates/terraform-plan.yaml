@@ -1,32 +1,21 @@
-# This is a basic workflow to help you get started with Actions
 name: Terraform Plan
 
-# Controls when the workflow will run
 on:
   pull_request:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.repo }}-${{ vars.terraform_workspace }}
+  group: $${{ github.repo }}-$${{ vars.terraform_workspace }}
 
 permissions: write-all
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
 jobs:
-  # This workflow contains a single job called "build"
   Plan:
-    # The type of runner that the job will run on
-    runs-on: ["229685449397"]
+    environment: ${staging_environment}
+    runs-on: ["${runs_on}"]
 
-    env:
-      TF_WORKSPACE: ${{ vars.terraform_workspace }}
-      TF_CLI_ARGS_plan: -lock-timeout=30m
-      TF_CLI_ARGS_apply: -lock-timeout=30m
-      NO_PROXY: ${{ vars.NO_PROXY }}
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: CSVD/gh-actions-checkout@v4
+      - uses: ${checkout}
         id: checkout
         with:
           persist-credentials: false
@@ -36,52 +25,52 @@ jobs:
 
       - name: AWS Auth
         id: aws_auth
-        uses: CSVD/aws-auth@main
+        uses: ${repo_org}/${aws_auth}
         with:
           ecs: true
 
       - name: Setup GITHUB Credentials
         id: github_credentials
-        uses: CSVD/gh-auth@main
+        uses: ${repo_org}/${gh_auth}
         with:
-          github_app_pem_file: ${{ secrets.GH_APP_PEM_FILE }}
-          github_app_installation_id: ${{ vars.GH_APP_INSTALLATION_ID }}
-          github_base_url: "${{ github.server_url }}/"
+          github_app_pem_file: $${{ secrets.GH_APP_PEM_FILE }}
+          github_app_installation_id: $${{ vars.GH_APP_INSTALLATION_ID }}
+          github_base_url: "$${{ github.server_url }}/"
 
       - name: Terraform Init
-        uses: CSVD/terraform-init@main
+        uses: ${repo_org}/${terraform_init}
         id: terraform_init
         with:
-          commit_sha: ${{ env.commit_sha }}
+          commit_sha: $${{ env.commit_sha }}
           checkout: false
-          terraform_version: ${{ vars.terraform_version }}
-          workspace: ${{ vars.terraform_workspace }}
+          terraform_version: $${{ vars.terraform_version }}
+          workspace: ${environment}
           setup_terraform: true
           terraform_init: true
           backend_config: backend-configs/$${{ vars.terraform_workspace }}.hcl
         env:
-          GITHUB_TOKEN: ${{ steps.github_credentials.outputs.github_token }}
-          AWS_ACCESS_KEY_ID: ${{ steps.aws_auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: ${{ steps.aws_auth.outputs.aws_session_token }}
+          GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
+          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
 
       - name: Terraform Plan
-        uses: CSVD/terraform-plan@main
+        uses: ${repo_org}/${terraform_plan}
         with:
-          terraform_version: ${{ vars.terraform_version }}
-          workspace: ${{ vars.terraform_workspace }}
-          commit_sha: ${{ steps.terraform_init.outputs.commit_sha }}
-          varfile: varfiles/${{ vars.terraform_workspace }}.tfvars
+          terraform_version: $${{ vars.terraform_version }}
+          workspace: ${environment}
+          commit_sha: $${{ steps.terraform_init.outputs.commit_sha }}
+          varfile: varfiles/$${{ vars.terraform_workspace }}.tfvars
           download_cache: true
           setup_terraform: false
-          cache_key: ${{ steps.terraform_init.outputs.s3_upload_path }}
+          cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
         env:
-          AWS_ACCESS_KEY_ID: ${{ steps.aws_auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: ${{ steps.aws_auth.outputs.aws_session_token }}
-          GITHUB_TOKEN: ${{ steps.github_credentials.outputs.github_token }}
-          GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_BASE_URL: "${{ github.server_url }}/"
+          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
+          GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
+          GITHUB_OWNER: $${{ github.repository_owner }}
+          GITHUB_BASE_URL: "$${{ github.server_url }}/"
           HTTP_PROXY: $${{ vars.http_proxy }}
           HTTPS_PROXY: $${{ vars.https_proxy}}
           NO_PROXY: $${{ vars.no_proxy}}

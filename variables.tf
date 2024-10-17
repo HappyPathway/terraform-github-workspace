@@ -27,13 +27,13 @@ variable "vars" {
 variable "composite_action_repos" {
   type = map(string)
   default = {
-    checkout             = "gh-actions-checkout@v4"
-    aws_auth             = "aws-auth@main"
-    setup_terraform      = "gh-actions-terraform@v1"
-    terraform_init       = "terraform-init@main"
-    terraform_plan       = "terraform-plan@main"
-    terraform_apply      = "terraform-apply@main"
-    gh_auth              = "gh-auth@main"
+    checkout        = "gh-actions-checkout@v4"
+    aws_auth        = "aws-auth@main"
+    setup_terraform = "gh-actions-terraform@v1"
+    terraform_init  = "terraform-init@main"
+    terraform_plan  = "terraform-plan@main"
+    terraform_apply = "terraform-apply@main"
+    gh_auth         = "gh-auth@main"
   }
   validation {
     condition     = length(var.composite_action_repos) >= 0
@@ -139,8 +139,9 @@ variable "reviewers_users" {
 variable "branch_pattern" {
   type        = string
   description = "Branch pattern for deployment policy"
+  default     = null
   validation {
-    condition     = length(var.branch_pattern) > 0
+    condition     = var.branch_pattern == null || length(var.branch_pattern) > 0
     error_message = "Branch pattern must not be empty."
   }
 }
@@ -234,3 +235,4 @@ variable "runner_group" {
     error_message = "Runner group name must not be empty."
   }
 }
+

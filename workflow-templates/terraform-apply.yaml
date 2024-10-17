@@ -1,40 +1,29 @@
-# This is a basic workflow to help you get started with Actions
 name: Terraform Apply
 
-# Controls when the workflow will run
 on:
   push:
     branches:
       - main
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 concurrency:
   group: $${{ github.repo }}-$${{ vars.terraform_workspace }}
 
 permissions: write-all
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  Plan:
-    # The type of runner that the job will run on
-    runs-on: ["${runs_on}"]
 
-    env:
-      TF_WORKSPACE: $${{ vars.terraform_workspace }}
-      TF_CLI_ARGS_plan: -lock-timeout=30m
-      TF_CLI_ARGS_apply: -lock-timeout=30m
-      NO_PROXY: $${{ vars.NO_PROXY }}
+jobs:
+  Plan:
+    environment: ${staging_environment}
+    runs-on: ["${runs_on}"]
 
     outputs:
       commit_sha: "$${{ steps.git_show.outputs.commit_sha }}"
-      cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
-      github_token: $${{ steps.github_credentials.outputs.github_token }}
-      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
-      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
-      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
+      cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}"
+      github_token: $${{ steps.github_credentials.outputs.github_token }}"
+      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}"
+      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}"
+      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}"
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: ${checkout}
         id: checkout
@@ -49,26 +38,26 @@ jobs:
 
       - name: AWS Auth
         id: aws_auth
-        uses: ${aws_auth}
+        uses: ${repo_org}/${aws_auth}
         with:
           ecs: true
 
       - name: Setup GITHUB Credentials
         id: github_credentials
-        uses: ${gh_auth}
+        uses: ${repo_org}/${gh_auth}
         with:
           github_app_pem_file: $${{ secrets.GH_APP_PEM_FILE }}
           github_app_installation_id: $${{ vars.GH_APP_INSTALLATION_ID }}
           github_base_url: "$${{ github.server_url }}/"
 
       - name: Terraform Init
-        uses: ${terraform_init}
+        uses: ${repo_org}/${terraform_init}
         id: terraform_init
         with:
           commit_sha: $${{ env.commit_sha }}
           checkout: false
           terraform_version: "1.9.1"
-          workspace: $${{ vars.terraform_workspace }}
+          workspace: ${environment}
           backend_config: backend-configs/$${{ vars.terraform_workspace }}.hcl
           setup_terraform: true
           terraform_init: true
@@ -79,10 +68,10 @@ jobs:
           AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
 
       - name: Terraform Plan
-        uses: ${terraform_plan}
+        uses: ${repo_org}/${terraform_plan}
         with:
-          terraform_version: "1.9.1"
-          workspace: $${{ vars.terraform_workspace }}
+          terraform_version: $${{ vars.terraform_version }}
+          workspace: ${environment}
           commit_sha: $${{ steps.terraform_init.outputs.commit_sha }}
           varfile: varfiles/$${{ vars.terraform_workspace }}.tfvars
           download_cache: true
@@ -107,23 +96,23 @@ jobs:
     steps:
       - name: AWS Auth
         id: aws_auth
-        uses: ${aws_auth}
+        uses: ${repo_org}/${aws_auth}
         with:
           ecs: true
 
       - name: Setup GITHUB Credentials
         id: github_credentials
-        uses: ${gh_auth}
+        uses: ${repo_org}/${gh_auth}
         with:
           github_app_pem_file: $${{ secrets.GH_APP_PEM_FILE }}
           github_app_installation_id: $${{ vars.GH_APP_INSTALLATION_ID }}
           github_base_url: "$${{ github.server_url }}/"
 
       - name: Terraform Apply
-        uses: ${terraform_apply}
+        uses: ${repo_org}/${terraform_apply}
         with:
-          terraform_version: "1.9.1"
-          workspace: $${{ vars.terraform_workspace }}
+          terraform_version: $${{ vars.terraform_version }}
+          workspace: ${environment}
           commit_sha: $${{ needs.Plan.outputs.commit_sha }}
           download_cache: true
           setup_terraform: true
