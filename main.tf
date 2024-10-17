@@ -31,7 +31,7 @@ resource "github_repository_deployment_branch_policy" "this" {
   count            = var.custom_branch_policies && var.branch != null ? 1 : 0
   repository       = data.github_repository.repo.name
   environment_name = local.environment
-  name             = var.branch
+  name             = var.branch.name
 }
 
 # Resource to create a deployment policy for the GitHub repository environment
