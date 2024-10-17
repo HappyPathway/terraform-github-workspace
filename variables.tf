@@ -70,6 +70,7 @@ variable "environment" {
 
 variable "branch" {
   type = object({
+    name                            = string
     create_branch                   = bool
     pattern                         = string
     enforce_admins                  = bool
