@@ -24,7 +24,7 @@ variable "vars" {
   }
 }
 
-variable "repos" {
+variable "composite_action_repos" {
   type = map(string)
   default = {
     gh_actions_checkout  = "gh-actions-checkout@v4"
