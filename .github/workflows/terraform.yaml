@@ -71,7 +71,6 @@ jobs:
   #     GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
      
   gtag:
-    needs: 
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     uses: HappyPathway/centralized-actions/.github/workflows/gtag.yml@main
     with: setup-terraform
