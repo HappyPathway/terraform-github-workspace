@@ -1,7 +1,7 @@
 # Resource to create a GitHub repository file for Terraform apply workflow
 resource "github_repository_file" "plan" {
   repository = data.github_repository.repo.name
-  file       = ".github/workflows/terraform-plan.yml"
+  file       = ".github/workflows/terraform-plan-${var.environment}.yml"
   content = templatefile(
     "${path.module}/workflow-templates/terraform-plan.yaml",
     {
@@ -34,9 +34,9 @@ resource "github_repository_file" "plan" {
 # Resource to create a GitHub repository file for Terraform apply workflow
 resource "github_repository_file" "apply" {
   repository = data.github_repository.repo.name
-  file       = ".github/workflows/terraform-apply.yml"
+  file       = ".github/workflows/terraform-apply-${var.environment}.yml"
   content = templatefile(
-    "${path.module}/workflow-templates/terraform-apply-${var.environment}.yaml",
+    "${path.module}/workflow-templates/terraform-apply.yaml",
     {
       repo_name           = data.github_repository.repo.name,
       repo_org            = var.repo_org,
