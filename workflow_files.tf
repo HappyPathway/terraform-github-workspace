@@ -23,6 +23,12 @@ resource "github_repository_file" "plan" {
     }
   )
   branch = data.github_repository.repo.default_branch
+  lifecycle {
+    ignore_changes = [
+      branch,
+      content
+    ]
+  }
 }
 
 # Resource to create a GitHub repository file for Terraform apply workflow
@@ -50,6 +56,12 @@ resource "github_repository_file" "apply" {
     }
   )
   branch = data.github_repository.repo.default_branch
+  lifecycle {
+    ignore_changes = [
+      branch,
+      content
+    ]
+  }
 }
 
 # Resource to create a GitHub repository file for Terraform init workflow
