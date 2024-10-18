@@ -25,7 +25,15 @@ variable "vars" {
 }
 
 variable "composite_action_repos" {
-  type = map(string)
+  type = object({
+    checkout        = optional(string, "gh-actions-checkout@v4")
+    aws_auth        = optional(string, "aws-auth@main")
+    setup_terraform = optional(string, "gh-actions-terraform@v1")
+    terraform_init  = optional(string, "terraform-init@main")
+    terraform_plan  = optional(string, "terraform-plan@main")
+    terraform_apply = optional(string, "terraform-apply@main")
+    gh_auth         = optional(string, "gh-auth@main")
+  })
   default = {
     checkout        = "gh-actions-checkout@v4"
     aws_auth        = "aws-auth@main"
@@ -167,23 +175,23 @@ variable "reviewers_users" {
   }
 }
 
-variable "restrictions_teams" {
-  type        = list(string)
-  description = "List of teams with branch restrictions"
-  validation {
-    condition     = length(var.restrictions_teams) >= 0
-    error_message = "Restrictions teams must be a list of strings."
-  }
-}
+# variable "restrictions_teams" {
+#   type        = list(string)
+#   description = "List of teams with branch restrictions"
+#   validation {
+#     condition     = length(var.restrictions_teams) >= 0
+#     error_message = "Restrictions teams must be a list of strings."
+#   }
+# }
 
-variable "restrictions_users" {
-  type        = list(string)
-  description = "List of users with branch restrictions"
-  validation {
-    condition     = length(var.restrictions_users) >= 0
-    error_message = "Restrictions users must be a list of strings."
-  }
-}
+# variable "restrictions_users" {
+#   type        = list(string)
+#   description = "List of users with branch restrictions"
+#   validation {
+#     condition     = length(var.restrictions_users) >= 0
+#     error_message = "Restrictions users must be a list of strings."
+#   }
+# }
 
 variable "prevent_self_review" {
   type        = bool
@@ -197,6 +205,7 @@ variable "prevent_self_review" {
 variable "custom_branch_policies" {
   type        = bool
   description = "Flag to enable custom branch policies"
+  default     = false
   validation {
     condition     = var.custom_branch_policies == true || var.custom_branch_policies == false
     error_message = "Custom branch policies must be a boolean."
@@ -206,6 +215,7 @@ variable "custom_branch_policies" {
 variable "branch_pattern" {
   type        = string
   description = "The branch pattern"
+  default     = "main"
   validation {
     condition     = length(var.branch_pattern) > 0
     error_message = "Branch pattern must not be empty."
