@@ -5,21 +5,21 @@ resource "github_repository_file" "plan" {
   content = templatefile(
     "${path.module}/workflow-templates/terraform-plan.yaml",
     {
-      repo_name            = data.github_repository.repo.name,
-      repo_org             = var.repo_org,
-      branch               = var.branch.name,
-      secrets              = var.secrets,
-      vars                 = var.vars,
-      runs_on              = var.runner_group,
-      aws_auth             = var.composite_action_repos.aws_auth,
-      gh_auth              = var.composite_action_repos.gh_auth,
-      gh_actions_terraform = var.composite_action_repos.setup_terraform,
-      terraform_init       = var.composite_action_repos.terraform_init,
-      terraform_plan       = var.composite_action_repos.terraform_plan,
-      terraform_apply      = var.composite_action_repos.terraform_apply,
-      checkout             = var.composite_action_repos.checkout,
-      environment          = lookup(github_repository_environment.this, var.environment).environment
-      staging_environment  = lookup(github_repository_environment.this, "${var.environment}-staging").environment
+      repo_name           = data.github_repository.repo.name,
+      repo_org            = var.repo_org,
+      branch              = var.branch.name,
+      secrets             = var.secrets,
+      vars                = var.vars,
+      runs_on             = var.runner_group,
+      aws_auth            = var.composite_action_repos.aws_auth,
+      gh_auth             = var.composite_action_repos.gh_auth,
+      setup_terraform     = var.composite_action_repos.setup_terraform,
+      terraform_init      = var.composite_action_repos.terraform_init,
+      terraform_plan      = var.composite_action_repos.terraform_plan,
+      terraform_apply     = var.composite_action_repos.terraform_apply,
+      checkout            = var.composite_action_repos.checkout,
+      environment         = lookup(github_repository_environment.this, var.environment).environment
+      staging_environment = lookup(github_repository_environment.this, "${var.environment}-staging").environment
     }
   )
   branch = data.github_repository.repo.default_branch
@@ -32,21 +32,21 @@ resource "github_repository_file" "apply" {
   content = templatefile(
     "${path.module}/workflow-templates/terraform-apply-${var.environment}.yaml",
     {
-      repo_name            = data.github_repository.repo.name,
-      repo_org             = var.repo_org,
-      branch               = var.branch.name,
-      secrets              = var.secrets,
-      vars                 = var.vars,
-      runs_on              = var.runner_group,
-      aws_auth             = var.composite_action_repos.aws_auth,
-      gh_auth              = var.composite_action_repos.gh_auth,
-      gh_actions_terraform = var.composite_action_repos.setup_terraform,
-      terraform_init       = var.composite_action_repos.terraform_init,
-      terraform_plan       = var.composite_action_repos.terraform_plan,
-      terraform_apply      = var.composite_action_repos.terraform_apply,
-      checkout             = var.composite_action_repos.checkout,
-      environment          = lookup(github_repository_environment.this, var.environment).environment
-      staging_environment  = lookup(github_repository_environment.this, "${var.environment}-staging").environment
+      repo_name           = data.github_repository.repo.name,
+      repo_org            = var.repo_org,
+      branch              = var.branch.name,
+      secrets             = var.secrets,
+      vars                = var.vars,
+      runs_on             = var.runner_group,
+      aws_auth            = var.composite_action_repos.aws_auth,
+      gh_auth             = var.composite_action_repos.gh_auth,
+      setup_terraform     = var.composite_action_repos.setup_terraform,
+      terraform_init      = var.composite_action_repos.terraform_init,
+      terraform_plan      = var.composite_action_repos.terraform_plan,
+      terraform_apply     = var.composite_action_repos.terraform_apply,
+      checkout            = var.composite_action_repos.checkout,
+      environment         = lookup(github_repository_environment.this, var.environment).environment
+      staging_environment = lookup(github_repository_environment.this, "${var.environment}-staging").environment
     }
   )
   branch = data.github_repository.repo.default_branch

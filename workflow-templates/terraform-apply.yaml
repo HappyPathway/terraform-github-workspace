@@ -56,7 +56,7 @@ jobs:
         with:
           commit_sha: $${{ env.commit_sha }}
           checkout: false
-          terraform_version: "1.9.1"
+          terraform_version: $${{ vars.terraform_version }}
           workspace: ${environment}
           backend_config: backend-configs/${environment}.hcl
           setup_terraform: true
