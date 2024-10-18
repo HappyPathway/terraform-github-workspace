@@ -54,7 +54,7 @@ resource "github_repository_file" "apply" {
 
 # Resource to create a GitHub repository file for Terraform init workflow
 resource "github_repository_file" "backend_tf" {
-  count      = var.state_config.set_backend == {} ? 0 : 1
+  count      = var.state_config.set_backend ? 1 : 0
   repository = data.github_repository.repo.name
   file       = "backend-configs/${var.environment}.tf"
   content = templatefile(

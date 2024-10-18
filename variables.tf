@@ -76,6 +76,16 @@ variable "environment" {
   }
 }
 
+variable "protected_branches" {
+  type        = bool
+  description = "Flag to protect branches"
+  default     = true
+  validation {
+    condition     = var.protected_branches == true || var.protected_branches == false
+    error_message = "Protected branches must be a boolean."
+  }
+}
+
 variable "branch" {
   type = object({
     name                            = string
@@ -135,42 +145,12 @@ variable "reviewers" {
   }
 }
 
-variable "create_branch" {
-  type        = bool
-  description = "Flag to create a branch"
-  default     = false
-  validation {
-    condition     = var.create_branch == true || var.create_branch == false
-    error_message = "Create branch must be a boolean."
-  }
-}
-
-variable "protected_branches" {
-  type        = bool
-  description = "Flag to protect branches"
-  default     = true
-  validation {
-    condition     = var.protected_branches == true || var.protected_branches == false
-    error_message = "Protected branches must be a boolean."
-  }
-}
-
 variable "reviewers_teams" {
   type        = list(string)
   description = "List of reviewer teams"
   default     = []
   validation {
     condition     = length(var.reviewers_teams) >= 0
-    error_message = "Reviewer teams must be a list of strings."
-  }
-}
-
-variable "reviewers_users" {
-  type        = list(string)
-  description = "List of reviewer teams"
-  default     = []
-  validation {
-    condition     = length(var.reviewers_users) >= 0
     error_message = "Reviewer teams must be a list of strings."
   }
 }
