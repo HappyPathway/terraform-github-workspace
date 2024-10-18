@@ -90,7 +90,6 @@ variable "branch" {
   type = object({
     name                            = string
     create_branch                   = optional(bool, false)
-    pattern                         = optional(string, "")
     enforce_admins                  = optional(bool, false)
     strict                          = optional(bool, false)
     contexts                        = optional(list(string), [])
@@ -105,10 +104,6 @@ variable "branch" {
   validation {
     condition     = var.branch.create_branch == true || var.branch.create_branch == false
     error_message = "Create branch must be a boolean."
-  }
-  validation {
-    condition     = length(var.branch.pattern) > 0
-    error_message = "Branch pattern must not be empty."
   }
   validation {
     condition     = var.branch.enforce_admins == true || var.branch.enforce_admins == false
