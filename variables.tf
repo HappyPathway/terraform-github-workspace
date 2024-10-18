@@ -132,15 +132,25 @@ variable "branch" {
 }
 
 variable "reviewers" {
-  type        = list(string)
-  description = "List of reviewers"
+  type        = string
+  description = "Number of reviewers required for deployment"
   validation {
-    condition     = length(var.reviewers) >= 0
-    error_message = "Reviewers must be a list of strings."
+    condition     = can(regex("^[0-9]+$", var.reviewers))
+    error_message = "Reviewers must be a valid number."
   }
 }
 
 variable "reviewers_teams" {
+  type        = list(string)
+  description = "List of reviewer teams"
+  default     = []
+  validation {
+    condition     = length(var.reviewers_teams) >= 0
+    error_message = "Reviewer teams must be a list of strings."
+  }
+}
+
+variable "reviewers_users" {
   type        = list(string)
   description = "List of reviewer teams"
   default     = []
