@@ -1,7 +1,13 @@
 # Resource to set branch protection rules for the GitHub repository
+resource "github_branch" "branch" {
+  count      = var.branch.create_branch ? 1 : 0
+  repository = data.github_repository.repo.name
+  branch     = var.branch.name
+}
+
 resource "github_branch_protection" "this" {
   count         = var.branch.create_branch ? 1 : 0
-  pattern       = var.branch.pattern
+  pattern       = github_branch.branch[0].branch
   repository_id = data.github_repository.repo.node_id
 
   enforce_admins = var.branch.enforce_admins
