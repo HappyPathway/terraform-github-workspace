@@ -155,7 +155,7 @@ variable "reviewers_users" {
   description = "List of reviewer teams"
   default     = []
   validation {
-    condition     = length(var.reviewers_teams) >= 0
+    condition     = length(var.reviewers_users) >= 0
     error_message = "Reviewer teams must be a list of strings."
   }
 }

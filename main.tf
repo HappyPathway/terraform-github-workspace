@@ -18,7 +18,7 @@ resource "github_repository_environment" "this" {
   repository          = data.github_repository.repo.name
   prevent_self_review = var.prevent_self_review
   reviewers {
-    users = var.reviewers
+    users = var.reviewers_users
     teams = var.reviewers_teams
   }
   deployment_branch_policy {
