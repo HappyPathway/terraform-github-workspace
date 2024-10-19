@@ -4,7 +4,13 @@ data "github_repository" "repo" {
 }
 
 locals {
-  environment         = lookup(github_repository_environment.this, var.environment).environment
+  # The main environment for deployment
+  environment = lookup(github_repository_environment.this, var.environment).environment
+
+  # The staging environment for running plans with the same data but without actual deployment
+  # this environment has a copy of the main environment's settings. 
+  # applies are bound to an environment. the envrironment is protected and requires an approval 
+  # in order to be deployed to. This staging-envrironment does not need approval and has the same data. 
   staging_environment = lookup(github_repository_environment.this, "${var.environment}-staging").environment
 }
 
