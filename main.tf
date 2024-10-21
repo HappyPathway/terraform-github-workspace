@@ -15,6 +15,20 @@ locals {
 }
 
 # Resource to create a GitHub repository environment
+
+# Retrieve information about a GitHub user.
+data "github_user" "reviewer" {
+  for_each = toset(var.reviewer_users)
+  username = each.value
+}
+
+data "github_organization_teams" "all" {}
+
+locals {
+  reviewer_teams = [ for team in data.github_organization_teams.all.teams : team.id if contains(var.reviewers_teams, team.name) ]
+  reviewer_users = [ for reviewer in toset(var.reviewer_users) : lookup(data.github_user.reviewer, reviewer).id]
+}
+
 resource "github_repository_environment" "this" {
   for_each = toset([
     var.environment,
@@ -24,8 +38,8 @@ resource "github_repository_environment" "this" {
   repository          = data.github_repository.repo.name
   prevent_self_review = var.prevent_self_review
   reviewers {
-    users = var.reviewers
-    teams = var.reviewers_teams
+    users = local.reviewer_users
+    teams = local.reviewer_teams
   }
   deployment_branch_policy {
     protected_branches     = var.protected_branches
