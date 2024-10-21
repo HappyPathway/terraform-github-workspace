@@ -18,7 +18,7 @@ locals {
 
 # Retrieve information about a GitHub user.
 data "github_user" "reviewer" {
-  for_each = toset(var.reviewer_users)
+  for_each = toset(var.reviewers_users)
   username = each.value
 }
 
