@@ -36,7 +36,7 @@ resource "github_repository_environment" "this" {
   ])
   environment         = each.value
   repository          = data.github_repository.repo.name
-  prevent_self_review = var.prevent_self_review
+  # prevent_self_review = var.prevent_self_review
   reviewers {
     users = local.reviewers_users
     teams = local.reviewers_teams
