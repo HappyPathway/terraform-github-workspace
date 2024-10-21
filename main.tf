@@ -25,8 +25,8 @@ data "github_user" "reviewer" {
 data "github_organization_teams" "all" {}
 
 locals {
-  reviewer_teams = [ for team in data.github_organization_teams.all.teams : team.id if contains(var.reviewers_teams, team.name) ]
-  reviewer_users = [ for reviewer in toset(var.reviewer_users) : lookup(data.github_user.reviewer, reviewer).id]
+  reviewers_teams = [ for team in data.github_organization_teams.all.teams : team.id if contains(var.reviewers_teams, team.name) ]
+  reviewers_users = [ for reviewer in toset(var.reviewers_users) : lookup(data.github_user.reviewer, reviewer).id]
 }
 
 resource "github_repository_environment" "this" {
@@ -38,8 +38,8 @@ resource "github_repository_environment" "this" {
   repository          = data.github_repository.repo.name
   prevent_self_review = var.prevent_self_review
   reviewers {
-    users = local.reviewer_users
-    teams = local.reviewer_teams
+    users = local.reviewers_users
+    teams = local.reviewers_teams
   }
   deployment_branch_policy {
     protected_branches     = var.protected_branches
