@@ -25,8 +25,8 @@ data "github_user" "reviewer" {
 data "github_organization_teams" "all" {}
 
 locals {
-  reviewers_teams = [ for team in data.github_organization_teams.all.teams : team.id if contains(var.reviewers_teams, team.name) ]
-  reviewers_users = [ for reviewer in toset(var.reviewers_users) : lookup(data.github_user.reviewer, reviewer).id]
+  reviewers_teams = [for team in data.github_organization_teams.all.teams : team.id if contains(var.reviewers_teams, team.name)]
+  reviewers_users = [for reviewer in toset(var.reviewers_users) : lookup(data.github_user.reviewer, reviewer).id]
 }
 
 resource "github_repository_environment" "this" {
