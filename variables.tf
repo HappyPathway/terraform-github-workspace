@@ -178,16 +178,6 @@ variable "reviewers_users" {
 #   }
 # }
 
-variable "prevent_self_review" {
-  type        = bool
-  description = "Flag to prevent self-reviews"
-  default     = false
-  validation {
-    condition     = var.prevent_self_review == true || var.prevent_self_review == false
-    error_message = "Prevent self-review must be a boolean."
-  }
-}
-
 variable "custom_branch_policies" {
   type        = bool
   description = "Flag to enable custom branch policies"
