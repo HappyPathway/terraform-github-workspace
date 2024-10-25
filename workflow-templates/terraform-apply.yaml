@@ -25,7 +25,7 @@ jobs:
       aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}"
 
     steps:
-      - uses: ${checkout}
+      - uses: ${repo_org}/${checkout}
         id: checkout
         with:
           persist-credentials: false

@@ -15,7 +15,7 @@ jobs:
     runs-on: ["${runs_on}"]
 
     steps:
-      - uses: ${checkout}
+      - uses: ${repo_org}/${checkout}
         id: checkout
         with:
           persist-credentials: false
