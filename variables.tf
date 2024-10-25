@@ -1,6 +1,6 @@
 variable "secrets" {
   type = list(object({
-    name  = string,
+    name  = string
     value = string
   }))
   default     = []
@@ -13,7 +13,7 @@ variable "secrets" {
 
 variable "vars" {
   type = list(object({
-    name  = string,
+    name  = string
     value = string
   }))
   default     = []
@@ -105,6 +105,19 @@ variable "environments" {
       protected_branches     = false
       custom_branch_policies = false
     })
+    state_config = optional(object({
+      bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397")
+      key            = optional(string, "terraform.tfstate")
+      region         = optional(string, "us-gov-west-1")
+      dynamodb_table = optional(string, "tf_remote_state")
+      set_backend    = optional(bool, false)
+      }), {
+      bucket         = "inf-tfstate-us-gov-west-1-229685449397"
+      key            = "terraform.tfstate"
+      region         = "us-gov-west-1"
+      dynamodb_table = "tf_remote_state"
+      set_backend    = false
+    })
     secrets = optional(list(object({
       name  = string
       value = string
@@ -152,31 +165,13 @@ variable "reviewers_teams" {
 
 variable "reviewers_users" {
   type        = list(string)
-  description = "List of reviewer teams"
+  description = "List of reviewer users"
   default     = []
   validation {
     condition     = length(var.reviewers_users) >= 0
-    error_message = "Reviewer teams must be a list of strings."
+    error_message = "Reviewer users must be a list of strings."
   }
 }
-
-# variable "restrictions_teams" {
-#   type        = list(string)
-#   description = "List of teams with branch restrictions"
-#   validation {
-#     condition     = length(var.restrictions_teams) >= 0
-#     error_message = "Restrictions teams must be a list of strings."
-#   }
-# }
-
-# variable "restrictions_users" {
-#   type        = list(string)
-#   description = "List of users with branch restrictions"
-#   validation {
-#     condition     = length(var.restrictions_users) >= 0
-#     error_message = "Restrictions users must be a list of strings."
-#   }
-# }
 
 variable "custom_branch_policies" {
   type        = bool

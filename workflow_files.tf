@@ -75,10 +75,10 @@ resource "github_repository_file" "backend_tf" {
   content = templatefile(
     "${path.module}/workflow-templates/backend.tpl",
     {
-      bucket         = var.state_config.bucket,
-      key            = var.state_config.key,
-      region         = var.state_config.region,
-      dynamodb_table = var.state_config.dynamodb_table
+      bucket         = each.value.state_config.bucket,
+      key            = each.value.state_config.key,
+      region         = each.value.state_config.region,
+      dynamodb_table = each.value.state_config.dynamodb_table
     }
   )
 }
