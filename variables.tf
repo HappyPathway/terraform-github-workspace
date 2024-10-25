@@ -68,6 +68,7 @@ variable "repo_org" {
 }
 
 variable "environments" {
+  default = []
   type = list(object({
     name = string
     reviewers = optional(object({
