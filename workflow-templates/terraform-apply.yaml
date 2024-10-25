@@ -13,7 +13,7 @@ permissions: write-all
 
 jobs:
   Plan:
-    environment: ${staging_environment}
+    environment: ${environment}
     runs-on: ["${runs_on}"]
 
     outputs:

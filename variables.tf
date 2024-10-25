@@ -67,12 +67,57 @@ variable "repo_org" {
   }
 }
 
-variable "environment" {
-  type        = string
-  description = "The environment name"
+variable "environments" {
+  type = list(object({
+    name = string
+    reviewers = optional(object({
+      users = list(string)
+      teams = list(string)
+      }), {
+      users = []
+      teams = []
+    })
+    deployment_branch_policy = optional(object({
+      branch                 = string
+      create_branch          = bool
+      protected_branches     = bool
+      custom_branch_policies = bool
+      enforce_admins         = optional(bool, false)
+      required_status_checks = optional(object({
+        strict   = optional(bool, true)
+        contexts = list(string)
+        }), {
+        strict   = false
+        contexts = []
+      })
+      required_pull_request_reviews = optional(object({
+        dismiss_stale_reviews           = optional(bool, true)
+        require_code_owner_reviews      = optional(bool, true)
+        required_approving_review_count = optional(number, 1)
+        }), {
+        dismiss_stale_reviews           = true
+        require_code_owner_reviews      = true
+        required_approving_review_count = 1
+      })
+      }), {
+      branch                 = "main"
+      create_branch          = false
+      protected_branches     = false
+      custom_branch_policies = false
+    })
+    secrets = optional(list(object({
+      name  = string
+      value = string
+    })), [])
+    vars = optional(list(object({
+      name  = string
+      value = string
+    })), [])
+  }))
+  description = "List of environments with their configurations"
   validation {
-    condition     = length(var.environment) > 0
-    error_message = "Environment name must not be empty."
+    condition     = length(var.environments) > 0
+    error_message = "Environments list must not be empty."
   }
 }
 
@@ -83,51 +128,6 @@ variable "protected_branches" {
   validation {
     condition     = var.protected_branches == true || var.protected_branches == false
     error_message = "Protected branches must be a boolean."
-  }
-}
-
-variable "branch" {
-  type = object({
-    name                            = string
-    create_branch                   = optional(bool, false)
-    enforce_admins                  = optional(bool, false)
-    strict                          = optional(bool, false)
-    contexts                        = optional(list(string), [])
-    dismiss_stale_reviews           = optional(bool, true)
-    require_code_owner_reviews      = optional(bool, false)
-    required_approving_review_count = optional(number, 1)
-  })
-  description = "Branch protection configuration"
-  default = {
-    name = "main"
-  }
-  validation {
-    condition     = var.branch.create_branch == true || var.branch.create_branch == false
-    error_message = "Create branch must be a boolean."
-  }
-  validation {
-    condition     = var.branch.enforce_admins == true || var.branch.enforce_admins == false
-    error_message = "Enforce admins must be a boolean."
-  }
-  validation {
-    condition     = var.branch.strict == true || var.branch.strict == false
-    error_message = "Strict must be a boolean."
-  }
-  validation {
-    condition     = length(var.branch.contexts) >= 0
-    error_message = "Contexts must be a list of strings."
-  }
-  validation {
-    condition     = var.branch.dismiss_stale_reviews == true || var.branch.dismiss_stale_reviews == false
-    error_message = "Dismiss stale reviews must be a boolean."
-  }
-  validation {
-    condition     = var.branch.require_code_owner_reviews == true || var.branch.require_code_owner_reviews == false
-    error_message = "Require code owner reviews must be a boolean."
-  }
-  validation {
-    condition     = var.branch.required_approving_review_count >= 0
-    error_message = "Required approving review count must be a non-negative number."
   }
 }
 

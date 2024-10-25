@@ -3,19 +3,6 @@ data "github_repository" "repo" {
   name = var.repo_name
 }
 
-locals {
-  # The main environment for deployment
-  environment = lookup(github_repository_environment.this, var.environment).environment
-
-  # The staging environment for running plans with the same data but without actual deployment
-  # this environment has a copy of the main environment's settings. 
-  # applies are bound to an environment. the envrironment is protected and requires an approval 
-  # in order to be deployed to. This staging-envrironment does not need approval and has the same data. 
-  staging_environment = lookup(github_repository_environment.this, "${var.environment}-staging").environment
-}
-
-# Resource to create a GitHub repository environment
-
 # Retrieve information about a GitHub user.
 data "github_user" "reviewer" {
   for_each = toset(var.reviewers_users)
@@ -30,34 +17,37 @@ locals {
 }
 
 resource "github_repository_environment" "this" {
-  for_each = toset([
-    var.environment,
-    "${var.environment}-staging"
-  ])
-  environment         = each.value
+  for_each            = toset(var.environments)
+  environment         = each.value.name
   repository          = data.github_repository.repo.name
   prevent_self_review = null
-  reviewers {
-    users = local.reviewers_users
-    teams = local.reviewers_teams
+  dynamic "reviewers" {
+    for_each = toset([each.value.reviewers == null ? [] : each.value.reviewers])
+    content {
+      users = reviewers.value.reviewers.users
+      teams = reviewers.value.reviewers.teams
+    }
   }
-  deployment_branch_policy {
-    protected_branches     = var.protected_branches
-    custom_branch_policies = var.custom_branch_policies
+  dynamic "deployment_branch_policy" {
+    for_each = toset([each.value.deployment_branch_policy == null ? [] : each.value.deployment_branch_policy])
+    content {
+      protected_branches     = deployment_branch_policy.value.deployment_branch_policy.protected_branches
+      custom_branch_policies = deployment_branch_policy.value.deployment_branch_policy.custom_branch_policies
+    }
   }
 }
 
 resource "github_repository_deployment_branch_policy" "this" {
-  count            = var.custom_branch_policies && var.branch != null ? 1 : 0
+  for_each         = toset([for environment in var.environments : environment.deployment_branch_policy if environment.deployment_branch_policy.branch != null])
   repository       = data.github_repository.repo.name
-  environment_name = local.environment
-  name             = var.branch.name
+  environment_name = each.value.name
+  name             = each.value.deployment_branch_policy.branch
 }
 
 # Resource to create a deployment policy for the GitHub repository environment
 resource "github_repository_environment_deployment_policy" "this" {
-  count          = var.custom_branch_policies && var.branch_pattern != null ? 1 : 0
+  for_each       = toset([for environment in var.environments : environment.deployment_branch_policy if environment.deployment_branch_policy.branch_pattern != null])
   repository     = data.github_repository.repo.name
-  environment    = local.environment
-  branch_pattern = var.branch_pattern
+  environment    = each.value.name
+  branch_pattern = each.value.deployment_branch_policy.branch_pattern
 }
