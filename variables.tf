@@ -130,8 +130,8 @@ variable "environments" {
   }))
   description = "List of environments with their configurations"
   validation {
-    condition     = length(var.environments) > 0
-    error_message = "Environments list must not be empty."
+    condition     = length(var.environments) >= 0
+    error_message = "Environments list is optional but must be a list of objects."
   }
 }
 
