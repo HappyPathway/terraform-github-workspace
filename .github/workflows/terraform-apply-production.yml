@@ -1,0 +1,130 @@
+name: Terraform Apply production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repo }}-${{ vars.terraform_workspace }}
+
+permissions: write-all
+
+jobs:
+  Plan:
+    environment: production
+    runs-on: ["self-hosted"]
+
+    outputs:
+      commit_sha: "${{ steps.git_show.outputs.commit_sha }}"
+      cache_key: ${{ steps.terraform_init.outputs.s3_upload_path }}"
+      github_token: ${{ steps.github_credentials.outputs.github_token }}"
+      aws_access_key_id: ${{ steps.aws_auth.outputs.aws_access_key_id }}"
+      aws_secret_access_key: ${{ steps.aws_auth.outputs.aws_secret_access_key }}"
+      aws_session_token: ${{ steps.aws_auth.outputs.aws_session_token }}"
+
+    steps:
+      - uses: HappyPathway/actions/checkout@v4
+        id: checkout
+        with:
+          persist-credentials: false
+
+      - name: git show
+        id: git_show
+        run: |
+          echo "commit_sha=$(git show | grep commit | head -1 | awk '{ print $NF }')" >> $GITHUB_ENV
+          echo "commit_sha=$(git show | grep commit | head -1 | awk '{ print $NF }')" >> $GITHUB_OUTPUT
+
+      - name: AWS Auth
+        id: aws_auth
+        uses: HappyPathway/aws-actions/configure-aws-credentials@v1
+        with:
+          ecs: true
+
+      - name: Setup GITHUB Credentials
+        id: github_credentials
+        uses: HappyPathway/actions/github-script@v4
+        with:
+          github_app_pem_file: ${{ secrets.GH_APP_PEM_FILE }}
+          github_app_installation_id: ${{ vars.GH_APP_INSTALLATION_ID }}
+          github_base_url: "${{ github.server_url }}/"
+
+      - name: Terraform Init
+        uses: HappyPathway/hashicorp/terraform-init@v1
+        id: terraform_init
+        with:
+          commit_sha: ${{ env.commit_sha }}
+          checkout: false
+          terraform_version: ${{ vars.terraform_version }}
+          workspace: production
+          backend_config: backend-configs/production.hcl
+          setup_terraform: true
+          terraform_init: true
+        env:
+          GITHUB_TOKEN: ${{ steps.github_credentials.outputs.github_token }}
+          AWS_ACCESS_KEY_ID: ${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: ${{ steps.aws_auth.outputs.aws_session_token }}
+
+      - name: Terraform Plan
+        uses: HappyPathway/hashicorp/terraform-plan@v1
+        with:
+          terraform_version: ${{ vars.terraform_version }}
+          workspace: production
+          commit_sha: ${{ steps.terraform_init.outputs.commit_sha }}
+          varfile: varfiles/${{ vars.terraform_workspace }}.tfvars
+          download_cache: true
+          setup_terraform: false
+          cache_key: ${{ steps.terraform_init.outputs.s3_upload_path }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: ${{ steps.aws_auth.outputs.aws_session_token }}
+          GITHUB_TOKEN: ${{ steps.github_credentials.outputs.github_token }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_BASE_URL: "${{ github.server_url }}/"
+          HTTP_PROXY: ${{ vars.http_proxy }}
+          HTTPS_PROXY: ${{ vars.https_proxy}}
+          NO_PROXY: ${{ vars.no_proxy}}
+
+  Apply:
+    # The type of runner that the job will run on
+    runs-on: ["self-hosted"]
+    needs: Plan
+    environment: production
+    steps:
+      - name: AWS Auth
+        id: aws_auth
+        uses: HappyPathway/aws-actions/configure-aws-credentials@v1
+        with:
+          ecs: true
+
+      - name: Setup GITHUB Credentials
+        id: github_credentials
+        uses: HappyPathway/actions/github-script@v4
+        with:
+          github_app_pem_file: ${{ secrets.GH_APP_PEM_FILE }}
+          github_app_installation_id: ${{ vars.GH_APP_INSTALLATION_ID }}
+          github_base_url: "${{ github.server_url }}/"
+
+      - name: Terraform Apply
+        uses: HappyPathway/hashicorp/terraform-apply@v1
+        with:
+          terraform_version: ${{ vars.terraform_version }}
+          workspace: production
+          commit_sha: ${{ needs.Plan.outputs.commit_sha }}
+          download_cache: true
+          setup_terraform: true
+          terraform_wrapper: false
+          cache_key: ${{ needs.Plan.outputs.cache_key }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: ${{ steps.aws_auth.outputs.aws_session_token }}
+          GITHUB_TOKEN: ${{ steps.github_credentials.outputs.github_token }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_BASE_URL: "${{ github.server_url }}/"
+          HTTP_PROXY: ${{ vars.http_proxy }}
+          HTTPS_PROXY: ${{ vars.https_proxy}}
+          NO_PROXY: ${{ vars.no_proxy}}
