@@ -3,7 +3,6 @@ module "github_actions" {
   source    = "./.." # Path to the root of the module
   repo_name = "terraform-github-workspace"
   repo_org  = "HappyPathway"
-
   environments = [
     {
       name = "production"
@@ -35,15 +34,4 @@ module "github_actions" {
       ]
     }
   ]
-
-  composite_action_repos = {
-    checkout        = "actions/checkout@v4"
-    aws_auth        = "aws-actions/configure-aws-credentials@v1"
-    setup_terraform = "hashicorp/setup-terraform@v1"
-    terraform_init  = "hashicorp/terraform-init@v1"
-    terraform_plan  = "hashicorp/terraform-plan@v1"
-    terraform_apply = "hashicorp/terraform-apply@v1"
-    gh_auth         = "actions/github-script@v4"
-  }
-  runner_group = "self-hosted"
 }

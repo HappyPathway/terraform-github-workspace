@@ -66,6 +66,7 @@ variable "repo_org" {
     error_message = "Repository organization must not be empty."
   }
 }
+
 # Variable definition for environments
 variable "environments" {
   default = []
@@ -75,7 +76,8 @@ variable "environments" {
     prevent_self_review = optional(bool, false)  # Flag to prevent self review
     wait_timer          = optional(number, null) # Wait timer for review
     # Reviewers configuration
-    can_admins_bypass = optional(bool, true) # Flag to allow admins to bypass
+    can_admins_bypass = optional(bool, true)            # Flag to allow admins to bypass
+    runner_group      = optional(string, "self-hosted") # Runner group
     reviewers = optional(object({
       users             = optional(list(string), []) # List of user reviewers
       teams             = optional(list(string), []) # List of team reviewers
@@ -146,65 +148,6 @@ variable "environments" {
   }
 }
 
-variable "protected_branches" {
-  type        = bool
-  description = "Flag to protect branches"
-  default     = true
-  validation {
-    condition     = var.protected_branches == true || var.protected_branches == false
-    error_message = "Protected branches must be a boolean."
-  }
-}
-
-variable "reviewers_teams" {
-  type        = list(string)
-  description = "List of reviewer teams"
-  default     = []
-  validation {
-    condition     = length(var.reviewers_teams) >= 0
-    error_message = "Reviewer teams must be a list of strings."
-  }
-}
-
-variable "reviewers_users" {
-  type        = list(string)
-  description = "List of reviewer users"
-  default     = []
-  validation {
-    condition     = length(var.reviewers_users) >= 0
-    error_message = "Reviewer users must be a list of strings."
-  }
-}
-
-variable "custom_branch_policies" {
-  type        = bool
-  description = "Flag to enable custom branch policies"
-  default     = false
-  validation {
-    condition     = var.custom_branch_policies == true || var.custom_branch_policies == false
-    error_message = "Custom branch policies must be a boolean."
-  }
-}
-
-variable "branch_pattern" {
-  type        = string
-  description = "The branch pattern"
-  default     = "main"
-  validation {
-    condition     = length(var.branch_pattern) > 0
-    error_message = "Branch pattern must not be empty."
-  }
-}
-
-variable "runner_group" {
-  type        = string
-  description = "The runner group name"
-  validation {
-    condition     = length(var.runner_group) > 0
-    error_message = "Runner group name must not be empty."
-  }
-}
-
 variable "state_config" {
   type = object({
     bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397")
@@ -212,6 +155,7 @@ variable "state_config" {
     region         = optional(string, "us-gov-west-1")
     dynamodb_table = optional(string, "tf_remote_state")
     set_backend    = optional(bool, false)
+    key_prefix     = optional(string, "terraform-state-files")
   })
   description = "Configuration for Terraform state storage"
 

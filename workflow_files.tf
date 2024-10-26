@@ -12,7 +12,7 @@ resource "github_repository_file" "plan" {
       branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
-      runs_on         = var.runner_group,
+      runs_on         = each.value.runner_group,
       aws_auth        = var.composite_action_repos.aws_auth,
       gh_auth         = var.composite_action_repos.gh_auth,
       setup_terraform = var.composite_action_repos.setup_terraform,
@@ -21,6 +21,7 @@ resource "github_repository_file" "plan" {
       terraform_apply = var.composite_action_repos.terraform_apply,
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
+      backend_config  = each.value.state_config != null ? "backend-configs/${each.value.name}.tf" : "backend.tf"
     }
   )
   branch = data.github_repository.repo.default_branch
@@ -46,7 +47,7 @@ resource "github_repository_file" "apply" {
       branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
-      runs_on         = var.runner_group,
+      runs_on         = each.value.runner_group,
       aws_auth        = var.composite_action_repos.aws_auth,
       gh_auth         = var.composite_action_repos.gh_auth,
       setup_terraform = var.composite_action_repos.setup_terraform,
@@ -55,6 +56,7 @@ resource "github_repository_file" "apply" {
       terraform_apply = var.composite_action_repos.terraform_apply,
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
+      backend_config  = each.value.state_config != null ? "backend-configs/${each.value.name}.tf" : "backend.tf"
     }
   )
   branch = data.github_repository.repo.default_branch
@@ -65,20 +67,48 @@ resource "github_repository_file" "apply" {
     ]
   }
 }
+locals {
+  # Create a map of environment-specific backend configurations
+  environment_specific_backend_configs = {
+    for env in var.environments : env.name => merge(
+      env.state_config,
+      {
+        path = "backend-configs/${env.name}.tf",
+        key  = "${env.key_prefix}/${env.name}.tfstate",
+      }
+    )
+    if env.state_config != null
+  }
+
+  # Global backend configuration
+  global_backend_config = merge(
+    var.state_config,
+    {
+      path = "backend.tf",
+      key  = "${var.state_config.key_prefix}/terraform.tfstate",
+    }
+  )
+
+  # Merge environment-specific and global backend configurations
+  backend_configs = merge(
+    local.environment_specific_backend_configs,
+    var.state_config.set_backend ? { "global" = local.global_backend_config } : {}
+  )
+}
 
 # Resource to create a GitHub repository file for Terraform init workflow
 resource "github_repository_file" "backend_tf" {
-  for_each            = tomap({ for env in var.environments : env.name => env if env.state_config != null })
+  for_each            = tomap(local.backend_configs)
   repository          = data.github_repository.repo.name
-  file                = "backend-configs/${each.value.name}.tf"
+  file                = each.value.path
   overwrite_on_create = true
   content = templatefile(
     "${path.module}/workflow-templates/backend.tpl",
     {
-      bucket         = each.value.state_config.bucket,
-      key            = "${each.value.state_config.key_prefix}/${each.value.name}.tfstate",
-      region         = each.value.state_config.region,
-      dynamodb_table = each.value.state_config.dynamodb_table
+      bucket         = each.value.bucket,
+      key            = each.value.key,
+      region         = each.value.region,
+      dynamodb_table = each.value.dynamodb_table
     }
   )
 }

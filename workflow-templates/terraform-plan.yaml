@@ -49,7 +49,7 @@ jobs:
           workspace: ${environment}
           setup_terraform: true
           terraform_init: true
-          backend_config: backend-configs/${environment}.hcl
+          backend_config: ${backend_config}
         env:
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
           AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}

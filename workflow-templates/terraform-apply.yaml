@@ -58,7 +58,7 @@ jobs:
           checkout: false
           terraform_version: $${{ vars.terraform_version }}
           workspace: ${environment}
-          backend_config: backend-configs/${environment}.hcl
+          backend_config: ${backend_config}
           setup_terraform: true
           terraform_init: true
         env:
