@@ -3,7 +3,7 @@ name: Terraform Apply ${environment}
 on:
   push:
     branches:
-      - main
+      - ${branch}
   workflow_dispatch:
 
 concurrency:

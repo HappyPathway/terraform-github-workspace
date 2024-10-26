@@ -9,7 +9,7 @@ resource "github_repository_file" "plan" {
     {
       repo_name       = data.github_repository.repo.name,
       repo_org        = var.repo_org,
-      branch          = each.value.deployment_branch_policy.branch,
+      branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
       runs_on         = var.runner_group,
@@ -43,7 +43,7 @@ resource "github_repository_file" "apply" {
     {
       repo_name       = data.github_repository.repo.name,
       repo_org        = var.repo_org,
-      branch          = each.value.deployment_branch_policy.branch,
+      branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
       runs_on         = var.runner_group,
@@ -68,7 +68,7 @@ resource "github_repository_file" "apply" {
 
 # Resource to create a GitHub repository file for Terraform init workflow
 resource "github_repository_file" "backend_tf" {
-  for_each            = tomap({ for env in var.environments : env.name => env })
+  for_each            = tomap({ for env in var.environments : env.name => env if env.state_config != null })
   repository          = data.github_repository.repo.name
   file                = "backend-configs/${each.value.name}.tf"
   overwrite_on_create = true
@@ -76,7 +76,7 @@ resource "github_repository_file" "backend_tf" {
     "${path.module}/workflow-templates/backend.tpl",
     {
       bucket         = each.value.state_config.bucket,
-      key            = each.value.state_config.key,
+      key            = "${each.value.state_config.key_prefix}/${each.value.name}.tfstate",
       region         = each.value.state_config.region,
       dynamodb_table = each.value.state_config.dynamodb_table
     }

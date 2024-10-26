@@ -66,35 +66,45 @@ variable "repo_org" {
     error_message = "Repository organization must not be empty."
   }
 }
-
+# Variable definition for environments
 variable "environments" {
   default = []
   type = list(object({
-    name = string
+    # Name of the environment
+    name                = string
+    prevent_self_review = optional(bool, false)  # Flag to prevent self review
+    wait_timer          = optional(number, null) # Wait timer for review
+    # Reviewers configuration
+    can_admins_bypass = optional(bool, true) # Flag to allow admins to bypass
     reviewers = optional(object({
-      users = list(string)
-      teams = list(string)
+      users             = optional(list(string), []) # List of user reviewers
+      teams             = optional(list(string), []) # List of team reviewers
+      enforce_reviewers = optional(bool, false)      # Flag to enforce reviewers
       }), {
       users = []
       teams = []
     })
+
+    # Deployment branch policy configuration
     deployment_branch_policy = optional(object({
-      branch                 = string
-      create_branch          = bool
-      protected_branches     = bool
-      custom_branch_policies = bool
-      enforce_admins         = optional(bool, false)
+      branch                 = optional(string)      # Branch name
+      branch_pattern         = optional(string)      # Branch pattern
+      create_branch          = optional(bool, false) # Flag to create branch
+      protected_branches     = optional(bool, true)  # Flag to protect branches
+      custom_branch_policies = optional(bool, false) # Flag to enable custom branch policies
+      enforce_admins         = optional(bool, false) # Flag to enforce admin rules
+      restrict_branches      = optional(bool, true)  # Flag to create policy
       required_status_checks = optional(object({
-        strict   = optional(bool, true)
-        contexts = list(string)
+        strict   = optional(bool, true) # Flag to enforce strict status checks
+        contexts = list(string)         # List of status check contexts
         }), {
         strict   = false
         contexts = []
       })
       required_pull_request_reviews = optional(object({
-        dismiss_stale_reviews           = optional(bool, true)
-        require_code_owner_reviews      = optional(bool, true)
-        required_approving_review_count = optional(number, 1)
+        dismiss_stale_reviews           = optional(bool, true) # Flag to dismiss stale reviews
+        require_code_owner_reviews      = optional(bool, true) # Flag to require code owner reviews
+        required_approving_review_count = optional(number, 1)  # Number of required approving reviews
         }), {
         dismiss_stale_reviews           = true
         require_code_owner_reviews      = true
@@ -103,29 +113,30 @@ variable "environments" {
       }), {
       branch                 = "main"
       create_branch          = false
-      protected_branches     = false
+      protected_branches     = true
       custom_branch_policies = false
     })
+
+    # State configuration for Terraform
     state_config = optional(object({
-      bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397")
-      key            = optional(string, "terraform.tfstate")
-      region         = optional(string, "us-gov-west-1")
-      dynamodb_table = optional(string, "tf_remote_state")
-      set_backend    = optional(bool, false)
-      }), {
-      bucket         = "inf-tfstate-us-gov-west-1-229685449397"
-      key            = "terraform.tfstate"
-      region         = "us-gov-west-1"
-      dynamodb_table = "tf_remote_state"
-      set_backend    = false
-    })
+      bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397") # S3 bucket name
+      key_prefix     = optional(string)                                           # Key prefix for the state file
+      region         = optional(string, "us-gov-west-1")                          # AWS region
+      dynamodb_table = optional(string, "tf_remote_state")                        # DynamoDB table for state locking
+      set_backend    = optional(bool, false)                                      # Flag to set backend
+      }), null
+    )
+
+    # Secrets for GitHub Actions
     secrets = optional(list(object({
-      name  = string
-      value = string
+      name  = string # Secret name
+      value = string # Secret value
     })), [])
+
+    # Variables for GitHub Actions
     vars = optional(list(object({
-      name  = string
-      value = string
+      name  = string # Variable name
+      value = string # Variable value
     })), [])
   }))
   description = "List of environments with their configurations"
@@ -142,15 +153,6 @@ variable "protected_branches" {
   validation {
     condition     = var.protected_branches == true || var.protected_branches == false
     error_message = "Protected branches must be a boolean."
-  }
-}
-
-variable "reviewers" {
-  type        = string
-  description = "Number of reviewers required for deployment"
-  validation {
-    condition     = can(regex("^[0-9]+$", var.reviewers))
-    error_message = "Reviewers must be a valid number."
   }
 }
 
