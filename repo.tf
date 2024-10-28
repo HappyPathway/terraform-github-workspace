@@ -22,6 +22,8 @@ module "repo" {
   archive_on_destroy      = var.repo.archive_on_destroy
   extra_files             = var.extra_files
   managed_extra_files     = var.managed_extra_files
+  secrets                 = var.secrets
+  vars                    = var.vars
 }
 
 locals {
