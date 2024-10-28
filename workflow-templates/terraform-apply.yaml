@@ -73,7 +73,7 @@ jobs:
           terraform_version: $${{ vars.terraform_version }}
           workspace: ${environment}
           commit_sha: $${{ steps.terraform_init.outputs.commit_sha }}
-          varfile: varfiles/$${{ vars.terraform_workspace }}.tfvars
+          varfile: varfiles/${repo}-${environment}.tfvars
           download_cache: true
           setup_terraform: false
           cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
