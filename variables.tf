@@ -163,6 +163,7 @@ variable "repo" {
     create_repo   = optional(bool, true)
     description   = optional(string, "")
     enforce_prs   = optional(bool, true)
+    codeowners    = optional(string, "")
     create_codeowners = optional(bool, false)
     github_organization_teams = optional(list(object({
       slug = string

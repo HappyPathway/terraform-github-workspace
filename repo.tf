@@ -12,7 +12,8 @@ module "repo" {
   github_repo_topics      = var.repo.repo_topics
   is_template             = var.repo.is_template
   force_name              = true
-  create_codeowners       = true
+  create_codeowners       = var.repo.create_codeowners
+  github_codeowners_team  = var.repo.codeowners
   enforce_prs             = false
   collaborators           = var.repo.collaborators
   pull_request_bypassers  = var.repo.pull_request_bypassers
