@@ -6,11 +6,12 @@ module "actions_environment_variables" {
     [
       {
         name  = "terraform_workspace"
-        value = "${var.repo_name}-${each.value.name}"
+        value = "${var.repo.name}-${each.value.name}"
       }
     ]
   )
 
   environment = each.value.name
-  repo_name   = var.repo_name
+  repo_name   = var.repo.name
+  depends_on  = [module.repo]
 }

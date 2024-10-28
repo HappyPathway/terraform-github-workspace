@@ -2,19 +2,19 @@
 resource "github_branch" "branch" {
   for_each = tomap(
     { for environment in var.environments :
-      environment.name => environment.deployment_branch_policy.branch if environment.deployment_branch_policy.create_branch && environment.deployment_branch_policy.branch != data.github_repository.repo.default_branch
-  })
-  repository = data.github_repository.repo.name
+  environment.name => environment.deployment_branch_policy.branch if environment.deployment_branch_policy.create_branch })
+  repository = local.repo.name
   branch     = each.value
+  depends_on = [module.repo]
 }
 
 resource "github_branch_protection" "branch_pattern" {
   for_each = tomap(
     { for environment in var.environments :
-      environment.name => environment if environment.deployment_branch_policy.branch_pattern != null
+      environment.name => environment if environment.deployment_branch_policy.branch_pattern != null && environment.deployment_branch_policy.create_branch_protection
   })
   pattern       = each.value.deployment_branch_policy.branch_pattern
-  repository_id = data.github_repository.repo.node_id
+  repository_id = local.repo.node_id
 
   enforce_admins = each.value.deployment_branch_policy.enforce_admins
 
@@ -38,16 +38,17 @@ resource "github_branch_protection" "branch_pattern" {
       required_approving_review_count = required_pull_request_reviews.value.required_approving_review_count
     }
   }
+  depends_on = [module.repo]
 }
 
 
 resource "github_branch_protection" "branch" {
   for_each = tomap(
     { for environment in var.environments :
-      environment.name => environment if environment.deployment_branch_policy.branch != null && environment.deployment_branch_policy.branch != data.github_repository.repo.default_branch
+      environment.name => environment if environment.deployment_branch_policy.branch != null && environment.deployment_branch_policy.create_branch_protection
   })
   pattern       = each.value.deployment_branch_policy.branch
-  repository_id = data.github_repository.repo.node_id
+  repository_id = local.repo.node_id
 
   enforce_admins = each.value.deployment_branch_policy.enforce_admins
 
@@ -71,4 +72,5 @@ resource "github_branch_protection" "branch" {
       required_approving_review_count = required_pull_request_reviews.value.required_approving_review_count
     }
   }
+  depends_on = [module.repo]
 }

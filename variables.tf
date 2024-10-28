@@ -49,24 +49,6 @@ variable "composite_action_repos" {
   }
 }
 
-variable "repo_name" {
-  type        = string
-  description = "The name of the repository"
-  validation {
-    condition     = length(var.repo_name) > 0
-    error_message = "Repository name must not be empty."
-  }
-}
-
-variable "repo_org" {
-  type        = string
-  description = "The organization of the repository"
-  validation {
-    condition     = length(var.repo_org) > 0
-    error_message = "Repository organization must not be empty."
-  }
-}
-
 # Variable definition for environments
 variable "environments" {
   default = []
@@ -89,13 +71,14 @@ variable "environments" {
 
     # Deployment branch policy configuration
     deployment_branch_policy = optional(object({
-      branch                 = optional(string)      # Branch name
-      branch_pattern         = optional(string)      # Branch pattern
-      create_branch          = optional(bool, false) # Flag to create branch
-      protected_branches     = optional(bool, true)  # Flag to protect branches
-      custom_branch_policies = optional(bool, false) # Flag to enable custom branch policies
-      enforce_admins         = optional(bool, false) # Flag to enforce admin rules
-      restrict_branches      = optional(bool, true)  # Flag to create policy
+      branch                   = optional(string)      # Branch name
+      branch_pattern           = optional(string)      # Branch pattern
+      create_branch            = optional(bool, false) # Flag to create branch
+      create_branch_protection = optional(bool, true)  # Flag to create branch protection
+      protected_branches       = optional(bool, true)  # Flag to protect branches
+      custom_branch_policies   = optional(bool, false) # Flag to enable custom branch policies
+      enforce_admins           = optional(bool, false) # Flag to enforce admin rules
+      restrict_branches        = optional(bool, true)  # Flag to create policy
       required_status_checks = optional(object({
         strict   = optional(bool, true) # Flag to enforce strict status checks
         contexts = list(string)         # List of status check contexts
@@ -173,4 +156,25 @@ variable "state_config" {
     condition     = can(regex("^[a-zA-Z0-9_.-]{3,255}$", var.state_config.dynamodb_table))
     error_message = "DynamoDB table name must be between 3 and 255 characters, and can contain only letters, numbers, underscores, dots, and hyphens."
   }
+}
+variable "repo" {
+  type = object({
+    collaborators = optional(map(string), {})
+    create_repo   = optional(bool, true)
+    description   = optional(string, "")
+    enforce_prs   = optional(bool, true)
+    github_organization_teams = optional(list(object({
+      slug = string
+      id   = string
+    })), [])
+    is_private             = optional(bool, false)
+    is_template            = optional(bool, false)
+    template_repo_org      = optional(string, null)
+    template_repo          = optional(string, null)
+    name                   = string
+    pull_request_bypassers = optional(list(string), [])
+    repo_org               = string
+    repo_topics            = optional(list(string), [])
+  })
+  description = "Configuration for the GitHub repository"
 }

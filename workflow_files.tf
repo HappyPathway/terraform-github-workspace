@@ -1,15 +1,15 @@
 # Resource to create a GitHub repository file for Terraform apply workflow
 resource "github_repository_file" "plan" {
   for_each            = tomap({ for env in var.environments : env.name => env })
-  repository          = data.github_repository.repo.name
+  repository          = local.repo.name
   file                = ".github/workflows/terraform-plan-${each.value.name}.yml"
   overwrite_on_create = true
   content = templatefile(
     "${path.module}/workflow-templates/terraform-plan.yaml",
     {
-      repo_name       = data.github_repository.repo.name,
-      repo_org        = var.repo_org,
-      branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
+      repo_name       = local.repo.name,
+      repo_org        = var.repo.repo_org,
+      branch          = compact([each.value.deployment_branch_policy.branch, local.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
       runs_on         = each.value.runner_group,
@@ -24,7 +24,7 @@ resource "github_repository_file" "plan" {
       backend_config  = each.value.state_config != null ? "backend-configs/${each.value.name}.tf" : "backend.tf"
     }
   )
-  branch = data.github_repository.repo.default_branch
+  branch = local.repo.default_branch
   lifecycle {
     ignore_changes = [
       branch,
@@ -36,15 +36,15 @@ resource "github_repository_file" "plan" {
 # Resource to create a GitHub repository file for Terraform apply workflow
 resource "github_repository_file" "apply" {
   for_each            = tomap({ for env in var.environments : env.name => env })
-  repository          = data.github_repository.repo.name
+  repository          = local.repo.name
   file                = ".github/workflows/terraform-apply-${each.value.name}.yml"
   overwrite_on_create = true
   content = templatefile(
     "${path.module}/workflow-templates/terraform-apply.yaml",
     {
-      repo_name       = data.github_repository.repo.name,
-      repo_org        = var.repo_org,
-      branch          = compact([each.value.deployment_branch_policy.branch, data.github_repository.repo.default_branch])[0],
+      repo_name       = local.repo.name,
+      repo_org        = var.repo.repo_org,
+      branch          = compact([each.value.deployment_branch_policy.branch, local.repo.default_branch])[0],
       secrets         = var.secrets,
       vars            = var.vars,
       runs_on         = each.value.runner_group,
@@ -59,7 +59,7 @@ resource "github_repository_file" "apply" {
       backend_config  = each.value.state_config != null ? "backend-configs/${each.value.name}.tf" : "backend.tf"
     }
   )
-  branch = data.github_repository.repo.default_branch
+  branch = local.repo.default_branch
   lifecycle {
     ignore_changes = [
       branch,
@@ -99,7 +99,7 @@ locals {
 # Resource to create a GitHub repository file for Terraform init workflow
 resource "github_repository_file" "backend_tf" {
   for_each            = tomap(local.backend_configs)
-  repository          = data.github_repository.repo.name
+  repository          = local.repo.name
   file                = each.value.path
   overwrite_on_create = true
   content = templatefile(
