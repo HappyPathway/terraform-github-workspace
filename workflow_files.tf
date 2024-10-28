@@ -74,7 +74,7 @@ locals {
       env.state_config,
       {
         path = "backend-configs/${env.name}.tf",
-        key  = "${env.key_prefix}/${env.name}.tfstate",
+        key  = "${env.state_config.key_prefix}/${env.name}.tfstate",
       }
     )
     if env.state_config != null
