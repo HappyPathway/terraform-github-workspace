@@ -20,6 +20,8 @@ module "repo" {
   github_is_private       = var.repo.is_private
   github_org_teams        = var.repo.github_organization_teams
   archive_on_destroy      = var.repo.archive_on_destroy
+  extra_files             = var.extra_files
+  managed_extra_files     = var.managed_extra_files
 }
 
 locals {
