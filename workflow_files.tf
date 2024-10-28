@@ -97,7 +97,7 @@ locals {
 }
 
 # Resource to create a GitHub repository file for Terraform init workflow
-resource "github_repository_file" "backend_tf" {
+resource "github_repository_file" "env_backend_tf" {
   for_each            = tomap(local.backend_configs)
   repository          = local.repo.name
   file                = each.value.path
@@ -127,7 +127,7 @@ resource "github_repository_file" "varfiles" {
   }
 }
 
-resource "github_repository_file" "varfiles" {
+resource "github_repository_file" "backend_tf" {
   repository          = local.repo.name
   file                = "backend.tf"
   overwrite_on_create = true
