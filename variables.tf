@@ -181,3 +181,22 @@ variable "repo" {
   })
   description = "Configuration for the GitHub repository"
 }
+
+
+variable "extra_files" {
+  type = list(object({
+    path    = string,
+    content = string
+  }))
+  default     = []
+  description = "Extra Files"
+}
+
+variable "managed_extra_files" {
+  type = list(object({
+    path    = string,
+    content = string
+  }))
+  default     = []
+  description = "Managed Extra Files. Changes to Content will be updated"
+}
