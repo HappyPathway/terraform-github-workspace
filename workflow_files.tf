@@ -116,7 +116,7 @@ resource "github_repository_file" "backend_tf" {
 resource "github_repository_file" "varfiles" {
   for_each            = tomap({ for environment in var.environments : environment.name => environment })
   repository          = local.repo.name
-  file                = "varfiles/${var.repo.name}-${each.value.name}.tfvars"
+  file                = "varfiles/${each.value.name}.tfvars"
   overwrite_on_create = true
   content = "# Add Terraform Variables here"
 }
