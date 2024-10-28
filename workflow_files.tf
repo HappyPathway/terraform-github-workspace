@@ -113,17 +113,6 @@ resource "github_repository_file" "backend_tf" {
   )
 }
 
-for_each = { for env in var.environments : env.name => env }
-  secrets  = each.value.secrets
-  vars = concat(each.value.vars,
-    [
-      {
-        name  = "terraform_workspace"
-        value = "${var.repo.name}-${each.value.name}"
-      }
-    ]
-  )
-
 resource "github_repository_file" "varfiles" {
   for_each            = tomap({ for environment in var.environments : environment.name => environment })
   repository          = local.repo.name
