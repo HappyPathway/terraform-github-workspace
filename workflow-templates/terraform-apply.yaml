@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: $${{ github.repo }}-$${{ vars.terraform_workspace }}
+  group: ${repo_name}-${environment}
 
 permissions: write-all
 
