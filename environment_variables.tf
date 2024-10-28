@@ -13,5 +13,8 @@ module "actions_environment_variables" {
 
   environment = each.value.name
   repo_name   = var.repo.name
-  depends_on  = [module.repo]
+  depends_on  = [
+    module.repo
+    github_repository_environment.this
+  ]
 }
