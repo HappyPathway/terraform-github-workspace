@@ -38,7 +38,12 @@ resource "github_branch_protection" "branch_pattern" {
       required_approving_review_count = required_pull_request_reviews.value.required_approving_review_count
     }
   }
-  depends_on = [module.repo]
+  depends_on = [
+    module.repo,
+    github_repository_file.plan,
+    github_repository_file.apply,
+    github_repository_file.backend_tf,
+  ]
 }
 
 
