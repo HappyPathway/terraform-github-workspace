@@ -21,7 +21,7 @@ resource "github_repository_file" "plan" {
       terraform_apply = var.composite_action_repos.terraform_apply,
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
-      backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.value.name}.tf" : "backend.tf"
+      backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
     }
   )
   branch = local.repo.default_branch
@@ -56,7 +56,7 @@ resource "github_repository_file" "apply" {
       terraform_apply = var.composite_action_repos.terraform_apply,
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
-      backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.value.name}.tf" : "backend.tf"
+      backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
     }
   )
   branch = local.repo.default_branch
