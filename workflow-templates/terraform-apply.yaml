@@ -8,13 +8,14 @@ on:
 
 concurrency:
   group: ${repo_name}-${environment}
+  cancel-in-progress: false
 
 permissions: write-all
 
 jobs:
   Plan:
     runs-on: ["${runs_on}"]
-
+    
     outputs:
       commit_sha: "$${{ steps.git_show.outputs.commit_sha }}"
       cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}"
