@@ -13,7 +13,7 @@ module "repo" {
   is_template             = var.repo.is_template
   force_name              = true
   create_codeowners       = true
-  enforce_prs             = var.repo.enforce_prs
+  enforce_prs             = false
   collaborators           = var.repo.collaborators
   pull_request_bypassers  = var.repo.pull_request_bypassers
   github_is_private       = var.repo.is_private
