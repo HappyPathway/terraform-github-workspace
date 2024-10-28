@@ -19,6 +19,7 @@ module "repo" {
   pull_request_bypassers  = var.repo.pull_request_bypassers
   github_is_private       = var.repo.is_private
   github_org_teams        = var.repo.github_organization_teams
+  archive_on_destroy      = var.repo.archive_on_destroy
 }
 
 locals {
