@@ -119,4 +119,23 @@ resource "github_repository_file" "varfiles" {
   file                = "varfiles/${each.value.name}.tfvars"
   overwrite_on_create = true
   content = "# Add Terraform Variables here"
+  lifecycle {
+    ignore_changes = [
+      branch,
+      content
+    ]
+  }
+}
+
+resource "github_repository_file" "varfiles" {
+  repository          = local.repo.name
+  file                = "backend.tf"
+  overwrite_on_create = true
+  content = file("${path.module}/workflow-templates/backend.tf")
+  lifecycle {
+    ignore_changes = [
+      branch,
+      content
+    ]
+  }
 }
