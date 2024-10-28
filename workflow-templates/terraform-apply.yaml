@@ -1,4 +1,4 @@
-name: ${upper(environment)}: Terraform Apply
+name: ${title(environment)}: Terraform Apply
 
 on:
   push:
