@@ -25,6 +25,7 @@ module "repo" {
   secrets                 = var.repo.secrets
   vars                    = var.repo.vars
   admin_teams             = var.repo.admin_teams
+  pull_request_bypassers  = var.repo.pull_request_bypassers
 }
 
 locals {
