@@ -1,32 +1,5 @@
-variable "composite_action_repos" {
+variable "environment" {
   type = object({
-    checkout        = optional(string, "gh-actions-checkout@v4")
-    aws_auth        = optional(string, "aws-auth@main")
-    setup_terraform = optional(string, "gh-actions-terraform@v1")
-    terraform_init  = optional(string, "terraform-init@main")
-    terraform_plan  = optional(string, "terraform-plan@main")
-    terraform_apply = optional(string, "terraform-apply@main")
-    gh_auth         = optional(string, "gh-auth@main")
-  })
-  default = {
-    checkout        = "gh-actions-checkout@v4"
-    aws_auth        = "aws-auth@main"
-    setup_terraform = "gh-actions-terraform@v1"
-    terraform_init  = "terraform-init@main"
-    terraform_plan  = "terraform-plan@main"
-    terraform_apply = "terraform-apply@main"
-    gh_auth         = "gh-auth@main"
-  }
-  validation {
-    condition     = length(var.composite_action_repos) >= 0
-    error_message = "Repos map must not be empty."
-  }
-}
-
-# Variable definition for environments
-variable "environments" {
-  default = []
-  type = list(object({
     # Name of the environment
     name                = string
     prevent_self_review = optional(bool, false)  # Flag to prevent self review
@@ -97,12 +70,7 @@ variable "environments" {
       name  = string # Variable name
       value = string # Variable value
     })), [])
-  }))
-  description = "List of environments with their configurations"
-  validation {
-    condition     = length(var.environments) >= 0
-    error_message = "Environments list is optional but must be a list of objects."
-  }
+  })
 }
 
 variable "state_config" {
@@ -173,3 +141,5 @@ variable "repo" {
   })
   description = "Configuration for the GitHub repository"
 }
+
+variable "teams" {}

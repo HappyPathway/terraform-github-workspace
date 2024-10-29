@@ -20,6 +20,7 @@ resource "github_repository_file" "plan" {
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
+      cache_bucket    = each.value.cache_bucket
     }
   )
   branch = local.repo.default_branch
@@ -53,6 +54,7 @@ resource "github_repository_file" "apply" {
       checkout        = var.composite_action_repos.checkout,
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
+      cache_bucket    = each.value.cache_bucket
     }
   )
   branch = local.repo.default_branch
