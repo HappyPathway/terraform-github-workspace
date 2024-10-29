@@ -78,9 +78,9 @@ jobs:
           HTTP_PROXY: $${{ vars.http_proxy }}
           HTTPS_PROXY: $${{ vars.https_proxy}}
           NO_PROXY: $${{ vars.no_proxy}}
-          %{ for var in vars ~}
+          %{~ for var in vars }
           TF_VAR_${var}: $${{ vars.${var} }}
           %{ endfor }
-          %{ for secret in secrets ~}
+          %{~ for secret in secrets }
           TF_VAR_${secret}: $${{ secrets.${secret} }}
           %{ endfor }
