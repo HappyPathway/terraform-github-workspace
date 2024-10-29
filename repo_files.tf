@@ -21,6 +21,14 @@ resource "github_repository_file" "plan" {
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
       cache_bucket    = each.value.cache_bucket
+      vars = concat(
+        [for var in var.repo.vars : var.name],
+        [for var in each.value.vars : var.name]
+      )
+      secres = concat(
+        [for secret in var.repo.secrets : secret.name],
+        [for secret in each.value.secrets : secret.name]
+      )
     }
   )
   branch = local.repo.default_branch
@@ -55,6 +63,14 @@ resource "github_repository_file" "apply" {
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
       cache_bucket    = each.value.cache_bucket
+      vars = concat(
+        [for var in var.repo.vars : var.name],
+        [for var in each.value.vars : var.name]
+      )
+      secres = concat(
+        [for secret in var.repo.secrets : secret.name],
+        [for secret in each.value.secrets : secret.name]
+      )
     }
   )
   branch = local.repo.default_branch
