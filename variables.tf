@@ -107,10 +107,10 @@ variable "environments" {
 
 variable "state_config" {
   type = object({
-    bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397")
-    key            = optional(string, "terraform.tfstate")
-    region         = optional(string, "us-gov-west-1")
-    dynamodb_table = optional(string, "tf_remote_state")
+    bucket         = optional(string)
+    key            = optional(string)
+    region         = optional(string)
+    dynamodb_table = optional(string)
     set_backend    = optional(bool, false)
     key_prefix     = optional(string, "terraform-state-files")
   })
