@@ -139,17 +139,17 @@ variable "repo" {
     description   = optional(string, "")
     enforce_prs   = optional(bool, true)
     codeowners    = optional(string, "")
-    vars          = list(object({
+    vars          = optional(list(object({
       name  = string
       value = string
-    }))
-    secrets = list(object({
+    })), [])
+    secrets = optional(list(object({
       name  = string
       value = string
-    }))
+    })), [])
     admin_teams = list(string)
     create_codeowners = optional(bool, false)
-    
+    pull_request_bypassers = optional(list(string), [])
     github_organization_teams = optional(list(object({
       slug = string
       id   = string
@@ -159,7 +159,6 @@ variable "repo" {
     template_repo_org      = optional(string, null)
     template_repo          = optional(string, null)
     name                   = string
-    pull_request_bypassers = optional(list(string), [])
     repo_org               = string
     repo_topics            = optional(list(string), [])
     archive_on_destroy     = optional(bool, false)

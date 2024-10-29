@@ -16,7 +16,6 @@ module "repo" {
   github_codeowners_team  = var.repo.codeowners
   enforce_prs             = var.repo.enforce_prs
   collaborators           = var.repo.collaborators
-  pull_request_bypassers  = var.repo.pull_request_bypassers
   github_is_private       = var.repo.is_private
   github_org_teams        = var.repo.github_organization_teams
   archive_on_destroy      = var.repo.archive_on_destroy
@@ -25,6 +24,7 @@ module "repo" {
   secrets                 = var.repo.secrets
   vars                    = var.repo.vars
   admin_teams             = var.repo.admin_teams
+  pull_request_bypassers  = var.repo.pull_request_bypassers
 }
 
 locals {
