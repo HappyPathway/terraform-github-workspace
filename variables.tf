@@ -162,25 +162,14 @@ variable "repo" {
     repo_org               = string
     repo_topics            = optional(list(string), [])
     archive_on_destroy     = optional(bool, false)
+    extra_files            = optional(list(object({
+      path    = string,
+      content = string
+    })), [])
+    managed_extra_files    = optional(list(object({
+      path    = string,
+      content = string
+    })), [])
   })
   description = "Configuration for the GitHub repository"
-}
-
-
-variable "extra_files" {
-  type = list(object({
-    path    = string,
-    content = string
-  }))
-  default     = []
-  description = "Extra Files"
-}
-
-variable "managed_extra_files" {
-  type = list(object({
-    path    = string,
-    content = string
-  }))
-  default     = []
-  description = "Managed Extra Files. Changes to Content will be updated"
 }
