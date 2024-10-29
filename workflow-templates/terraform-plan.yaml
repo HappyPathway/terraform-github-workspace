@@ -1,4 +1,4 @@
-name: ${title(environment)}: Terraform Plan
+name: ${title(environment)} - Terraform Plan
 
 on:
   pull_request:
