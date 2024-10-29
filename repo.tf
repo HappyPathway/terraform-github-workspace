@@ -14,16 +14,17 @@ module "repo" {
   force_name              = true
   create_codeowners       = var.repo.create_codeowners
   github_codeowners_team  = var.repo.codeowners
-  enforce_prs             = false
+  enforce_prs             = var.repo.enforce_prs
   collaborators           = var.repo.collaborators
   pull_request_bypassers  = var.repo.pull_request_bypassers
   github_is_private       = var.repo.is_private
   github_org_teams        = var.repo.github_organization_teams
   archive_on_destroy      = var.repo.archive_on_destroy
-  extra_files             = var.extra_files
-  managed_extra_files     = var.managed_extra_files
-  secrets                 = var.secrets
-  vars                    = var.vars
+  extra_files             = var.repo.extra_files
+  managed_extra_files     = var.repo.managed_extra_files
+  secrets                 = var.repo.secrets
+  vars                    = var.repo.vars
+  admin_teams             = var.repo.admin_teams
 }
 
 locals {
