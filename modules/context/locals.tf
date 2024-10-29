@@ -9,6 +9,6 @@ locals {
   _create_branch_protection            = var.environment.deployment_branch_policy.create_branch_protection
   create_branch_protection_pattern     = local.branch_pattern_specified && local._create_branch_protection
   create_branch_protection_branch      = local.branch_specified && local._create_branch_protection
-  required_status_checks               = var.environment.deployment_branch_policy.required_status_checks != null
+  required_status_checks_set           = var.environment.deployment_branch_policy.required_status_checks != null
   required_pull_request_reviews        = var.environment.deployment_branch_policy.required_pull_request_reviews
 }

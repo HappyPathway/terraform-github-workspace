@@ -54,7 +54,7 @@ resource "github_branch_protection" "branch" {
   enforce_admins = each.value.deployment_branch_policy.enforce_admins
 
   dynamic "required_status_checks" {
-    for_each = toset(lookup(module.context, each.key).required_status_checks)
+    for_each = toset([lookup(module.context, each.key).required_status_checks])
     content {
       strict   = required_status_checks.value.strict
       contexts = required_status_checks.value.contexts

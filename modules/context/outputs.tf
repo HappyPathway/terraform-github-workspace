@@ -27,10 +27,14 @@ output "create_branch_protection_branch" {
   value = local.create_branch_protection_branch
 }
 
+output "required_status_checks_set" {
+  value = local.required_status_checks_set
+}
+
 output "required_status_checks" {
-  value = local.required_status_checks
+  value = local.required_status_checks_set ? [var.environment.deployment_branch_policy.required_status_checks] : []
 }
 
 output "required_pull_request_reviews" {
-  value = local.required_pull_request_reviews
+  value = var.environment.deployment_branch_policy.required_pull_request_reviews
 }
