@@ -91,10 +91,10 @@ jobs:
           NO_PROXY: $${{ vars.no_proxy}}
            %{ for var in vars ~}
           TF_VAR_${var}: $${{ vars.${var} }}
-          %{ endfor ~}
+          %{ endfor }
           %{ for secret in secrets ~}
           TF_VAR_${secret}: $${{ secrets.${secret} }}
-          %{ endfor ~}
+          %{ endfor }
 
 
 
