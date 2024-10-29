@@ -78,11 +78,11 @@ variable "environments" {
 
     # State configuration for Terraform
     state_config = optional(object({
-      bucket         = optional(string, "inf-tfstate-us-gov-west-1-229685449397") # S3 bucket name
-      key_prefix     = optional(string)                                           # Key prefix for the state file
-      region         = optional(string, "us-gov-west-1")                          # AWS region
-      dynamodb_table = optional(string, "tf_remote_state")                        # DynamoDB table for state locking
-      set_backend    = optional(bool, false)                                      # Flag to set backend
+      bucket         = optional(string)      # S3 bucket name
+      key_prefix     = optional(string)      # Key prefix for the state file
+      region         = optional(string)      # AWS region
+      dynamodb_table = optional(string)      # DynamoDB table for state locking
+      set_backend    = optional(bool, false) # Flag to set backend
       }), null
     )
 
