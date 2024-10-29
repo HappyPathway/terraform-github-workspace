@@ -1,29 +1,3 @@
-variable "secrets" {
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  default     = []
-  description = "Github Action Secrets"
-  validation {
-    condition     = length(var.secrets) >= 0
-    error_message = "Secrets must be a list of objects with name and value."
-  }
-}
-
-variable "vars" {
-  type = list(object({
-    name  = string
-    value = string
-  }))
-  default     = []
-  description = "Github Action Vars"
-  validation {
-    condition     = length(var.vars) >= 0
-    error_message = "Vars must be a list of objects with name and value."
-  }
-}
-
 variable "composite_action_repos" {
   type = object({
     checkout        = optional(string, "gh-actions-checkout@v4")
@@ -157,6 +131,7 @@ variable "state_config" {
     error_message = "DynamoDB table name must be between 3 and 255 characters, and can contain only letters, numbers, underscores, dots, and hyphens."
   }
 }
+
 variable "repo" {
   type = object({
     collaborators = optional(map(string), {})
@@ -164,7 +139,17 @@ variable "repo" {
     description   = optional(string, "")
     enforce_prs   = optional(bool, true)
     codeowners    = optional(string, "")
+    vars          = list(object({
+      name  = string
+      value = string
+    }))
+    secrets = list(object({
+      name  = string
+      value = string
+    }))
+    admin_teams = list(string)
     create_codeowners = optional(bool, false)
+    
     github_organization_teams = optional(list(object({
       slug = string
       id   = string
