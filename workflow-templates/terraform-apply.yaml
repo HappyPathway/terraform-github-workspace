@@ -17,12 +17,12 @@ jobs:
     runs-on: ["${runs_on}"]
     
     outputs:
-      commit_sha: "$${{ steps.git_show.outputs.commit_sha }}"
-      cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}"
-      github_token: $${{ steps.github_credentials.outputs.github_token }}"
-      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}"
-      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}"
-      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}"
+      commit_sha: $${{ steps.git_show.outputs.commit_sha }}
+      cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
+      github_token: $${{ steps.github_credentials.outputs.github_token }}
+      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
 
     steps:
       - uses: ${repo_org}/${checkout}
