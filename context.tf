@@ -4,5 +4,5 @@ module "context" {
   environment  = each.value
   repo         = var.repo
   state_config = var.state_config
-  teams        = data.github_organization_teams.all
+  teams        = data.github_organization_teams.all.teams
 }
