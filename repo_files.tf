@@ -25,7 +25,7 @@ resource "github_repository_file" "plan" {
         [for var in var.repo.vars : var.name],
         [for var in each.value.vars : var.name]
       )
-      secres = concat(
+      secrets = concat(
         [for secret in var.repo.secrets : secret.name],
         [for secret in each.value.secrets : secret.name]
       )
@@ -67,7 +67,7 @@ resource "github_repository_file" "apply" {
         [for var in var.repo.vars : var.name],
         [for var in each.value.vars : var.name]
       )
-      secres = concat(
+      secrets = concat(
         [for secret in var.repo.secrets : secret.name],
         [for secret in each.value.secrets : secret.name]
       )
