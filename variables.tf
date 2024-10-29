@@ -159,7 +159,6 @@ variable "repo" {
     template_repo_org      = optional(string, null)
     template_repo          = optional(string, null)
     name                   = string
-    pull_request_bypassers = optional(list(string), [])
     repo_org               = string
     repo_topics            = optional(list(string), [])
     archive_on_destroy     = optional(bool, false)
