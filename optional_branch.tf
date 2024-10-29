@@ -10,8 +10,8 @@ resource "github_branch" "branch" {
 
 resource "github_branch_protection" "branch_pattern" {
   for_each = tomap(
-    { for environment in var.environments :
-      environment.name => environment if environment.deployment_branch_policy.branch_pattern != null && environment.deployment_branch_policy.create_branch_protection
+    { for env in var.environments :
+      env.name => env if lookup(module.context, env.name).create_branch_protection_pattern
   })
   pattern       = each.value.deployment_branch_policy.branch_pattern
   repository_id = local.repo.node_id
@@ -19,11 +19,7 @@ resource "github_branch_protection" "branch_pattern" {
   enforce_admins = each.value.deployment_branch_policy.enforce_admins
 
   dynamic "required_status_checks" {
-    for_each = toset(
-      [
-        for environment in var.environments :
-        each.value.deployment_branch_policy.required_status_checks if each.value.deployment_branch_policy.required_status_checks != null
-    ])
+    for_each = toset(lookup(module.context, each.key).required_status_checks)
     content {
       strict   = required_status_checks.value.strict
       contexts = required_status_checks.value.contexts
@@ -31,7 +27,7 @@ resource "github_branch_protection" "branch_pattern" {
   }
 
   dynamic "required_pull_request_reviews" {
-    for_each = toset([for environment in var.environments : each.value.deployment_branch_policy.required_pull_request_reviews])
+    for_each = toset(lookup(module.context, each.key).required_pull_request_reviews)
     content {
       dismiss_stale_reviews           = required_pull_request_reviews.value.dismiss_stale_reviews
       require_code_owner_reviews      = required_pull_request_reviews.value.require_code_owner_reviews
@@ -49,8 +45,8 @@ resource "github_branch_protection" "branch_pattern" {
 
 resource "github_branch_protection" "branch" {
   for_each = tomap(
-    { for environment in var.environments :
-      environment.name => environment if environment.deployment_branch_policy.branch != null && environment.deployment_branch_policy.create_branch_protection
+    { for env in var.environments :
+      env.name => env if lookup(module.context, env.name).create_branch_protection_branch
   })
   pattern       = each.value.deployment_branch_policy.branch
   repository_id = local.repo.node_id
@@ -58,11 +54,7 @@ resource "github_branch_protection" "branch" {
   enforce_admins = each.value.deployment_branch_policy.enforce_admins
 
   dynamic "required_status_checks" {
-    for_each = toset(
-      [
-        for environment in var.environments :
-        each.value.deployment_branch_policy.required_status_checks if each.value.deployment_branch_policy.required_status_checks != null
-    ])
+    for_each = toset(lookup(module.context, each.key).required_status_checks)
     content {
       strict   = required_status_checks.value.strict
       contexts = required_status_checks.value.contexts
@@ -70,7 +62,7 @@ resource "github_branch_protection" "branch" {
   }
 
   dynamic "required_pull_request_reviews" {
-    for_each = toset([for environment in var.environments : each.value.deployment_branch_policy.required_pull_request_reviews])
+    for_each = toset(lookup(module.context, each.key).required_pull_request_reviews)
     content {
       dismiss_stale_reviews           = required_pull_request_reviews.value.dismiss_stale_reviews
       require_code_owner_reviews      = required_pull_request_reviews.value.require_code_owner_reviews
