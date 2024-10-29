@@ -35,6 +35,6 @@ output "required_status_checks" {
   value = local.required_status_checks_set ? [local.required_status_checks] : []
 }
 
-output "required_pull_request_reviews_set" {
-  value = local.required_pull_request_reviews_set ? [var.environment.deployment_branch_policy.required_pull_request_reviews] : []
+output "required_pull_request_reviews" {
+  value = local.required_pull_request_reviews_set ? [local.required_pull_request_reviews] : []
 }
