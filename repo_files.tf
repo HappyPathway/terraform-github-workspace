@@ -10,8 +10,6 @@ resource "github_repository_file" "plan" {
       repo_name       = local.repo.name,
       repo_org        = var.repo.repo_org,
       branch          = compact([each.value.deployment_branch_policy.branch, local.repo.default_branch])[0],
-      secrets         = var.secrets,
-      vars            = var.vars,
       runs_on         = each.value.runner_group,
       aws_auth        = var.composite_action_repos.aws_auth,
       gh_auth         = var.composite_action_repos.gh_auth,
@@ -45,8 +43,6 @@ resource "github_repository_file" "apply" {
       repo_name       = local.repo.name,
       repo_org        = var.repo.repo_org,
       branch          = compact([each.value.deployment_branch_policy.branch, local.repo.default_branch])[0],
-      secrets         = var.secrets,
-      vars            = var.vars,
       runs_on         = each.value.runner_group,
       aws_auth        = var.composite_action_repos.aws_auth,
       gh_auth         = var.composite_action_repos.gh_auth,
@@ -118,7 +114,7 @@ resource "github_repository_file" "varfiles" {
   repository          = local.repo.name
   file                = "varfiles/${each.value.name}.tfvars"
   overwrite_on_create = true
-  content = "# Add Terraform Variables here"
+  content             = "# Add Terraform Variables here"
   lifecycle {
     ignore_changes = [
       branch,
@@ -131,7 +127,7 @@ resource "github_repository_file" "backend_tf" {
   repository          = local.repo.name
   file                = "backend.tf"
   overwrite_on_create = true
-  content = file("${path.module}/workflow-templates/backend.tf")
+  content             = file("${path.module}/workflow-templates/backend.tf")
   lifecycle {
     ignore_changes = [
       branch,

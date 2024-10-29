@@ -15,7 +15,7 @@ permissions: write-all
 jobs:
   Plan:
     runs-on: ["${runs_on}"]
-    
+
     outputs:
       commit_sha: $${{ steps.git_show.outputs.commit_sha }}
       cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
@@ -61,6 +61,7 @@ jobs:
           backend_config: ${backend_config}
           setup_terraform: true
           terraform_init: true
+          cache_bucket: ${cache_bucket}
         env:
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
           AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
@@ -76,6 +77,7 @@ jobs:
           varfile: varfiles/${environment}.tfvars
           download_cache: true
           setup_terraform: false
+          cache_bucket: ${cache_bucket}
           cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
         env:
           AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
@@ -117,6 +119,7 @@ jobs:
           download_cache: true
           setup_terraform: true
           terraform_wrapper: false
+          cache_bucket: ${cache_bucket}
           cache_key: $${{ needs.Plan.outputs.cache_key }}
         env:
           AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}

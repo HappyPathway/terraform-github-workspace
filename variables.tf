@@ -42,7 +42,7 @@ variable "environments" {
       users = []
       teams = []
     })
-
+    cache_bucket = string
     # Deployment branch policy configuration
     deployment_branch_policy = optional(object({
       branch                   = optional(string)      # Branch name
@@ -139,7 +139,7 @@ variable "repo" {
     description   = optional(string, "")
     enforce_prs   = optional(bool, true)
     codeowners    = optional(string, "")
-    vars          = optional(list(object({
+    vars = optional(list(object({
       name  = string
       value = string
     })), [])
@@ -147,26 +147,26 @@ variable "repo" {
       name  = string
       value = string
     })), [])
-    admin_teams = list(string)
-    create_codeowners = optional(bool, false)
+    admin_teams            = list(string)
+    create_codeowners      = optional(bool, false)
     pull_request_bypassers = optional(list(string), [])
     github_organization_teams = optional(list(object({
       slug = string
       id   = string
     })), [])
-    is_private             = optional(bool, false)
-    is_template            = optional(bool, false)
-    template_repo_org      = optional(string, null)
-    template_repo          = optional(string, null)
-    name                   = string
-    repo_org               = string
-    repo_topics            = optional(list(string), [])
-    archive_on_destroy     = optional(bool, false)
-    extra_files            = optional(list(object({
+    is_private         = optional(bool, false)
+    is_template        = optional(bool, false)
+    template_repo_org  = optional(string, null)
+    template_repo      = optional(string, null)
+    name               = string
+    repo_org           = string
+    repo_topics        = optional(list(string), [])
+    archive_on_destroy = optional(bool, false)
+    extra_files = optional(list(object({
       path    = string,
       content = string
     })), [])
-    managed_extra_files    = optional(list(object({
+    managed_extra_files = optional(list(object({
       path    = string,
       content = string
     })), [])
