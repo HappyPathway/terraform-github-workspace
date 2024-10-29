@@ -35,7 +35,6 @@ resource "github_repository_file" "plan" {
   lifecycle {
     ignore_changes = [
       branch,
-      content
     ]
   }
 }
@@ -77,7 +76,6 @@ resource "github_repository_file" "apply" {
   lifecycle {
     ignore_changes = [
       branch,
-      content
     ]
   }
 }
