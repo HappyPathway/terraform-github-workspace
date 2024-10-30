@@ -117,19 +117,6 @@ variable "state_config" {
   description = "Configuration for Terraform state storage"
 
   default = {}
-
-  validation {
-    condition     = can(regex("^[a-z0-9.-]{3,63}$", var.state_config.bucket))
-    error_message = "Bucket name must be between 3 and 63 characters, and can contain only lowercase letters, numbers, dots, and hyphens."
-  }
-  validation {
-    condition     = can(regex("^(us|eu|ap|sa|ca|af|me|us-gov)-(north|south|east|west|central|northeast|southeast|southwest|northwest|central)-[0-9]$", var.state_config.region))
-    error_message = "Region must be a valid AWS region, e.g., us-east-1, eu-west-3, us-gov-west-1."
-  }
-  validation {
-    condition     = can(regex("^[a-zA-Z0-9_.-]{3,255}$", var.state_config.dynamodb_table))
-    error_message = "DynamoDB table name must be between 3 and 255 characters, and can contain only letters, numbers, underscores, dots, and hyphens."
-  }
 }
 
 variable "repo" {
