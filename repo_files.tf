@@ -140,6 +140,7 @@ resource "github_repository_file" "varfiles" {
 }
 
 resource "github_repository_file" "backend_tf" {
+  count = var.state_config.set_backend ? 0 : 1
   repository          = local.repo.name
   file                = "backend.tf"
   overwrite_on_create = true
