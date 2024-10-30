@@ -5,7 +5,7 @@ resource "github_repository_file" "plan" {
   file                = ".github/workflows/terraform-plan-${each.value.name}.yml"
   overwrite_on_create = true
   content = templatefile(
-    "${path.module}/workflow-templates/terraform-plan.yaml",
+    "${path.module}/workflow-templates/terraform-plan.tftpl",
     {
       repo_name       = local.repo.name,
       repo_org        = var.repo.repo_org,
@@ -46,7 +46,7 @@ resource "github_repository_file" "apply" {
   file                = ".github/workflows/terraform-apply-${each.value.name}.yml"
   overwrite_on_create = true
   content = templatefile(
-    "${path.module}/workflow-templates/terraform-apply.yaml",
+    "${path.module}/workflow-templates/terraform-apply.tftpl",
     {
       repo_name       = local.repo.name,
       repo_org        = var.repo.repo_org,
@@ -140,7 +140,7 @@ resource "github_repository_file" "varfiles" {
 }
 
 resource "github_repository_file" "backend_tf" {
-  count = var.state_config.set_backend ? 0 : 1
+  count               = var.state_config.set_backend ? 0 : 1
   repository          = local.repo.name
   file                = "backend.tf"
   overwrite_on_create = true
