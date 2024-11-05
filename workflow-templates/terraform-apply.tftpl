@@ -17,12 +17,13 @@ jobs:
     runs-on: ["${runs_on}"]
 
     outputs:
-      commit_sha: $${{ steps.git_show.outputs.commit_sha }}
-      cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
-      github_token: $${{ steps.github_credentials.outputs.github_token }}
-      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
-      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
-      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
+      commit_sha: ${{ steps.git_show.outputs.commit_sha }}
+      cache_key: ${{ steps.terraform_init.outputs.s3_upload_path }}
+      github_token: ${{ steps.github_credentials.outputs.github_token }}
+      aws_access_key_id: ${{ steps.aws_auth.outputs.aws_access_key_id }}
+      aws_secret_access_key: ${{ steps.aws_auth.outputs.aws_secret_access_key }}
+      aws_session_token: ${{ steps.aws_auth.outputs.aws_session_token }}
+      pending_changes: ${{ steps.terraform_plan.outputs.pending_changes }}
 
     steps:
       - uses: ${repo_org}/${checkout}
@@ -69,6 +70,7 @@ jobs:
           AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
 
       - name: Terraform Plan
+        id: terraform_plan
         uses: ${repo_org}/${terraform_plan}
         with:
           terraform_version: $${{ vars.terraform_version }}
@@ -101,6 +103,7 @@ jobs:
   Apply:
     # The type of runner that the job will run on
     runs-on: ["${runs_on}"]
+    if ${{ needs.Plan.outputs.pending_changes == 'true' }}
     needs: Plan
     environment: ${environment}
     steps:
