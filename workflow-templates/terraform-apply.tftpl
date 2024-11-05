@@ -103,7 +103,7 @@ jobs:
   Apply:
     # The type of runner that the job will run on
     runs-on: ["${runs_on}"]
-    if ${{ needs.Plan.outputs.pending_changes == 'true' }}
+    if: ${{ needs.Plan.outputs.pending_changes == 'true' }}
     needs: Plan
     environment: ${environment}
     steps:
