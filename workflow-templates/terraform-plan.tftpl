@@ -85,18 +85,8 @@ jobs:
           TF_VAR_${secret}: $${{ secrets.${secret} }}
           %{ endfor }
 
-  Cleanup:
-    runs-on: ["${runs_on}"]
-    needs: Plan
-    environment: ${environment}
-    steps:
-      - name: AWS Auth
-        id: aws_auth
-        uses: ${repo_org}/${aws_auth}
-        with:
-          ecs: true
-
       - name: cleanup s3
+        if: ${{ always() }}
         id: s3_cleanup
         uses: ${repo_org}/${s3_cleanup}
         with:
