@@ -21,6 +21,7 @@ resource "github_repository_file" "plan" {
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
       cache_bucket    = each.value.cache_bucket
+      s3_cleanup      = var.composite_action_repos.s3_cleanup
       vars = distinct(concat(
         [for var in var.repo.vars : var.name],
         [for var in each.value.vars : var.name]
@@ -62,6 +63,7 @@ resource "github_repository_file" "apply" {
       environment     = lookup(github_repository_environment.this, each.value.name).environment
       backend_config  = each.value.state_config.set_backend ? "backend-configs/${each.key}.tf" : "backend.tf"
       cache_bucket    = each.value.cache_bucket
+      s3_cleanup      = var.composite_action_repos.s3_cleanup
       vars = distinct(concat(
         [for var in var.repo.vars : var.name],
         [for var in each.value.vars : var.name]
