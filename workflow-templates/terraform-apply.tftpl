@@ -98,6 +98,13 @@ jobs:
           TF_VAR_${secret}: $${{ secrets.${secret} }}
           %{ endfor }
 
+      - name: cleanup s3
+        if: ${{ failure() }}
+        id: s3_cleanup
+        uses: ${repo_org}/${s3_cleanup}
+        with:
+          cache_bucket: ${cache_bucket}
+          cache_key: $${{ needs.Plan.outputs.cache_key }}
 
 
   Apply:
@@ -142,18 +149,8 @@ jobs:
           HTTPS_PROXY: $${{ vars.https_proxy}}
           NO_PROXY: $${{ vars.no_proxy}}
 
-  Cleanup:
-    runs-on: ["${runs_on}"]
-    needs: [Plan, Apply]
-    environment: ${environment}
-    steps:
-      - name: AWS Auth
-        id: aws_auth
-        uses: ${repo_org}/${aws_auth}
-        with:
-          ecs: true
-
       - name: cleanup s3
+        if: ${{ always() }}
         id: s3_cleanup
         uses: ${repo_org}/${s3_cleanup}
         with:
