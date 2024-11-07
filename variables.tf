@@ -7,16 +7,9 @@ variable "composite_action_repos" {
     terraform_plan  = optional(string, "terraform-plan@main")
     terraform_apply = optional(string, "terraform-apply@main")
     gh_auth         = optional(string, "gh-auth@main")
+    s3_cleanup      = optional(string, "s3-cleanup@main")
   })
-  default = {
-    checkout        = "gh-actions-checkout@v4"
-    aws_auth        = "aws-auth@main"
-    setup_terraform = "gh-actions-terraform@v1"
-    terraform_init  = "terraform-init@main"
-    terraform_plan  = "terraform-plan@main"
-    terraform_apply = "terraform-apply@main"
-    gh_auth         = "gh-auth@main"
-  }
+  default = {}
   validation {
     condition     = length(var.composite_action_repos) >= 0
     error_message = "Repos map must not be empty."
