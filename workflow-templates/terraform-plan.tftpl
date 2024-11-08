@@ -86,7 +86,7 @@ jobs:
           %{ endfor }
 
       - name: cleanup s3
-        if: ${{ always() }}
+        if: $${{ always() }}
         id: s3_cleanup
         uses: ${repo_org}/${s3_cleanup}
         with:
