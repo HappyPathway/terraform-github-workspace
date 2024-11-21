@@ -1,7 +1,3 @@
-# Retrieve information about a GitHub user.
-
-
-
 # Resource to create a GitHub repository environment
 resource "github_repository_environment" "this" {
   for_each            = local.environments
