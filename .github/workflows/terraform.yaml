@@ -37,7 +37,6 @@ jobs:
 
       - uses: actions/upload-artifact@master
         name: Archive Configuration
-        if: github.ref == 'refs/heads/main'
         with:
           name: terraform_dir
           path: .terraform
@@ -46,7 +45,6 @@ jobs:
 
       - uses: actions/upload-artifact@master
         name: Archive Lockfile
-        if: github.ref == 'refs/heads/main'
         with:
           name: terraform_lockfile
           path: .terraform.lock.hcl
