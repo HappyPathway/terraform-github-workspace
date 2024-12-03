@@ -27,6 +27,7 @@ variable "environments" {
     # Reviewers configuration
     can_admins_bypass = optional(bool, true)            # Flag to allow admins to bypass
     runner_group      = optional(string, "self-hosted") # Runner group
+    runs_on_auth      = optional(string, "self-hosted") # Authenticates on this runner
     reviewers = optional(object({
       users             = optional(list(string), []) # List of user reviewers
       teams             = optional(list(string), []) # List of team reviewers
