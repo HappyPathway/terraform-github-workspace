@@ -13,9 +13,23 @@ concurrency:
 permissions: write-all
 
 jobs:
+  Auth:
+    runs-on: ["${runs_on_auth}"]
+
+    outputs:
+      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
+
+    steps:
+      - name: AWS Auth
+        id: aws_auth
+        uses: ${repo_org}/${aws_auth}
+        with:
+          ecs: true
   Plan:
     runs-on: ["${runs_on}"]
-
+    needs: Auth
     steps:
       - uses: ${repo_org}/${checkout}
         id: checkout
@@ -53,9 +67,9 @@ jobs:
           cache_bucket: ${cache_bucket}
         env:
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
-          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
+          AWS_ACCESS_KEY_ID: $${{ needs.Auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ needs.Auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ needs.Auth.outputs.aws_session_token }}
 
       - name: Terraform Plan
         uses: ${repo_org}/${terraform_plan}
@@ -69,9 +83,9 @@ jobs:
           cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
           cache_bucket: ${cache_bucket}
         env:
-          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
+          AWS_ACCESS_KEY_ID: $${{ needs.Auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ needs.Auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ needs.Auth.outputs.aws_session_token }}
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
           GITHUB_OWNER: $${{ github.repository_owner }}
           GITHUB_BASE_URL: "$${{ github.server_url }}/"
