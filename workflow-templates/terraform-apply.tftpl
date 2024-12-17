@@ -13,28 +13,16 @@ concurrency:
 permissions: write-all
 
 jobs:
-  Auth:
-    runs-on: ["${runs_on_auth}"]
-
-    outputs:
-      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
-      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
-      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
-
-    steps:
-      - name: AWS Auth
-        id: aws_auth
-        uses: ${repo_org}/${aws_auth}
-        with:
-          ecs: true
-
   Plan:
     runs-on: ["${runs_on}"]
-    needs: Auth
+
     outputs:
       commit_sha: $${{ steps.git_show.outputs.commit_sha }}
       cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
       github_token: $${{ steps.github_credentials.outputs.github_token }}
+      aws_access_key_id: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+      aws_secret_access_key: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+      aws_session_token: $${{ steps.aws_auth.outputs.aws_session_token }}
       pending_changes: $${{ steps.terraform_plan.outputs.pending_changes }}
 
     steps:
@@ -48,6 +36,12 @@ jobs:
         run: |
           echo "commit_sha=$(git show | grep commit | head -1 | awk '{ print $NF }')" >> $GITHUB_ENV
           echo "commit_sha=$(git show | grep commit | head -1 | awk '{ print $NF }')" >> $GITHUB_OUTPUT
+
+      - name: AWS Auth
+        id: aws_auth
+        uses: ${repo_org}/${aws_auth}
+        with:
+          ecs: true
 
       - name: Setup GITHUB Credentials
         id: github_credentials
@@ -71,9 +65,9 @@ jobs:
           cache_bucket: ${cache_bucket}
         env:
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
-          AWS_ACCESS_KEY_ID: $${{ needs.Auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: $${{ needs.Auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: $${{ needs.Auth.outputs.aws_session_token }}
+          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
 
       - name: Terraform Plan
         id: terraform_plan
@@ -88,9 +82,9 @@ jobs:
           cache_bucket: ${cache_bucket}
           cache_key: $${{ steps.terraform_init.outputs.s3_upload_path }}
         env:
-          AWS_ACCESS_KEY_ID: $${{ needs.Auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: $${{ needs.Auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: $${{ needs.Auth.outputs.aws_session_token }}
+          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
           GITHUB_OWNER: $${{ github.repository_owner }}
           GITHUB_BASE_URL: "$${{ github.server_url }}/"
@@ -116,7 +110,7 @@ jobs:
   Apply:
     # The type of runner that the job will run on
     runs-on: ["${runs_on}"]
-    needs: [Plan, Auth]
+    needs: Plan
     environment: ${environment}
     steps:
       - name: AWS Auth
@@ -145,9 +139,9 @@ jobs:
           cache_bucket: ${cache_bucket}
           cache_key: $${{ needs.Plan.outputs.cache_key }}
         env:
-          AWS_ACCESS_KEY_ID: $${{ needs.Auth.outputs.aws_access_key_id }}
-          AWS_SECRET_ACCESS_KEY: $${{ needs.Auth.outputs.aws_secret_access_key }}
-          AWS_SESSION_TOKEN: $${{ needs.Auth.outputs.aws_session_token }}
+          AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
+          AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
           GITHUB_TOKEN: $${{ steps.github_credentials.outputs.github_token }}
           GITHUB_OWNER: $${{ github.repository_owner }}
           GITHUB_BASE_URL: "$${{ github.server_url }}/"
