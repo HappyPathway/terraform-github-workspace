@@ -68,6 +68,9 @@ jobs:
           AWS_ACCESS_KEY_ID: $${{ steps.aws_auth.outputs.aws_access_key_id }}
           AWS_SECRET_ACCESS_KEY: $${{ steps.aws_auth.outputs.aws_secret_access_key }}
           AWS_SESSION_TOKEN: $${{ steps.aws_auth.outputs.aws_session_token }}
+          HTTP_PROXY: $${{ vars.http_proxy }}
+          HTTPS_PROXY: $${{ vars.https_proxy}}
+          NO_PROXY: $${{ vars.no_proxy}}
 
       - name: Terraform Plan
         id: terraform_plan
